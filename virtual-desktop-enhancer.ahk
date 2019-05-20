@@ -36,7 +36,8 @@ global UnPinAppProc := DllCall("GetProcAddress", Ptr, hVirtualDesktopAccessor, A
 DllCall(RegisterPostMessageHookProc, Int, hwnd, Int, 0x1400 + 30)
 OnMessage(0x1400 + 30, "VWMess")
 VWMess(wParam, lParam, msg, hwnd) {
-    OnDesktopSwitch(lParam + 1)
+    Critical
+    OnDesktopSwitch()
 }
 
 ; ======================================================================
@@ -77,19 +78,19 @@ global GeneralIconDir := GeneralIconDir ~= "/$" ? GeneralIconDir : GeneralIconDi
 global taskbarPrimaryID=0
 global taskbarSecondaryID=0
 global previousDesktopNo=0
+global desktopSwitched=0
+global processingDesktopSwitch=0
 global doFocusAfterNextSwitch=0
 global numberedHotkeys={}
 
 global changeDesktopNamesPopupTitle := "Windows 10 Virtual Desktop Enhancer"
 global changeDesktopNamesPopupText :=  "Change the desktop name of desktop #{:d}"
 
-initialDesktopNo := _GetCurrentDesktopNumber()
-
-if (GeneralDefaultDesktop != "" && GeneralDefaultDesktop > 0 && GeneralDefaultDesktop != initialDesktopNo) {
+if (GeneralDefaultDesktop != "" && GeneralDefaultDesktop > 0 && GeneralDefaultDesktop != _GetCurrentDesktopNumber()) {
     SwitchToDesktop(GeneralDefaultDesktop)
 } else {
     ; Call "OnDesktopSwitch" since it wouldn't be called otherwise
-    OnDesktopSwitch(initialDesktopNo)
+    OnDesktopSwitch()
 }
 
 ; ======================================================================
@@ -222,6 +223,7 @@ if (GeneralTaskbarScrollSwitching) {
 ; ======================================================================
 
 OnShiftNumberedPress() {
+    Critical
     n := numberedHotkeys[A_ThisHotkey]
     if (n) {
         SwitchToDesktop(n)
@@ -236,6 +238,7 @@ OnMoveNumberedPress() {
 }
 
 OnMoveAndShiftNumberedPress() {
+    Critical
     n := numberedHotkeys[A_ThisHotkey]
     if (n) {
         MoveAndSwitchToDesktop(n)
@@ -243,36 +246,44 @@ OnMoveAndShiftNumberedPress() {
 }
 
 OnShiftLeftPress() {
+    Critical
     SwitchToDesktop(_GetPreviousDesktopNumber())
 }
 
 OnShiftRightPress() {
+    Critical
     SwitchToDesktop(_GetNextDesktopNumber())
 }
 
 OnMoveLeftPress() {
+    Critical
     MoveToDesktop(_GetPreviousDesktopNumber())
 }
 
 OnMoveRightPress() {
+    Critical
     MoveToDesktop(_GetNextDesktopNumber())
 }
 
 OnMoveAndShiftLeftPress() {
+    Critical
     MoveAndSwitchToDesktop(_GetPreviousDesktopNumber())
 }
 
 OnMoveAndShiftRightPress() {
+    Critical
     MoveAndSwitchToDesktop(_GetNextDesktopNumber())
 }
 
 OnTaskbarScrollUp() {
+    Critical
     if (_IsCursorHoveringTaskbar()) {
         OnShiftLeftPress()
     }
 }
 
 OnTaskbarScrollDown() {
+    Critical
     if (_IsCursorHoveringTaskbar()) {
         OnShiftRightPress()
     }
@@ -332,39 +343,73 @@ OnTogglePinAppPress() {
     }
 }
 
-OnDesktopSwitch(n:=1) {
+OnDesktopSwitch() {
+    ; Process the event in a separate low-priority thread to avoid accidentally
+    ;   dropping any messages (they have priority 0 by default).
+    desktopSwitched := 1  ; Indicate to the processing code that a new switching event has occurred
+    if (processingDesktopSwitch == 0) {
+        SetTimer, ProcessDesktopSwitch, 10, -1
+    }
+}
+
+ProcessDesktopSwitch() {
+    processingDesktopSwitch := 1
+    SetTimer,, Off
+    desktopSwitched := 0  ; Consume the switching event
+    n := _GetCurrentDesktopNumber()
+    failed := !TryProcessDesktopSwitch(n) || n != _GetCurrentDesktopNumber()
+    ; failed == 1 if a new switching event occurred while processing the current one.
+
+    ; Mind the order of the next two lines. It prevents a race condition between OnDesktopSwitch
+    ;   and ProcessDesktopSwitch that could lead to a dropped event. The worst that could happen
+    ;   with the following statement order is the timer being set twice (in which case it will just reset).
+    processingDesktopSwitch := 0
+    if (failed || desktopSwitched) {
+        processingDesktopSwitch := 1
+        SetTimer, ProcessDesktopSwitch, 10, -1
+    }
+}
+
+TryProcessDesktopSwitch(n) {
+    _ChangeAppearance(n)
     ; Give focus first, then display the popup, otherwise the popup could
-    ; steal the focus from the legitimate window until it disappears.
-    _FocusIfRequested()
+    ;   steal the focus from the legitimate window until it disappears.
+    if (!_TryFocusIfRequested(n, 1)) {
+        return false
+    }
     if (TooltipsEnabled) {
         _ShowTooltipForDesktopSwitch(n)
     }
-    _ChangeAppearance(n)
     _ChangeBackground(n)
+
+    if (desktopSwitched) {
+        return false
+    }
 
     if (previousDesktopNo) {
         _RunProgramWhenSwitchingFromDesktop(previousDesktopNo)
     }
     _RunProgramWhenSwitchingToDesktop(n)
     previousDesktopNo := n
+    return true
 }
 
 ; ======================================================================
 ; Functions
 ; ======================================================================
 
-SwitchToDesktop(n:=1) {
-    doFocusAfterNextSwitch=1
+SwitchToDesktop(n) {
+    doFocusAfterNextSwitch := 1
     _ChangeDesktop(n)
 }
 
-MoveToDesktop(n:=1) {
+MoveToDesktop(n) {
     _MoveCurrentWindowToDesktop(n)
-    _Focus()
+    _TryFocus(n)
 }
 
-MoveAndSwitchToDesktop(n:=1) {
-    doFocusAfterNextSwitch=1
+MoveAndSwitchToDesktop(n) {
+    doFocusAfterNextSwitch := 1
     _MoveCurrentWindowToDesktop(n)
     _ChangeDesktop(n)
 }
@@ -425,7 +470,7 @@ _TruncateString(string:="", n:=10) {
     return (StrLen(string) > n ? SubStr(string, 1, n-3) . "..." : string)
 }
 
-_GetDesktopName(n:=1) {
+_GetDesktopName(n) {
     name := DesktopNames%n%
     if (!name) {
         name := "Desktop " . n
@@ -434,7 +479,7 @@ _GetDesktopName(n:=1) {
 }
 
 ; Set the name of the nth desktop to the value of a given string.
-_SetDesktopName(n:=1, name:=0) {
+_SetDesktopName(n, name) {
     if (!name) {
         ; Default value: "Desktop N".
         name := "Desktop " %n%
@@ -482,13 +527,13 @@ _GetNumberOfCyclableDesktops() {
     return numDesktops
 }
 
-_MoveCurrentWindowToDesktop(n:=1) {
+_MoveCurrentWindowToDesktop(n) {
     activeHwnd := _GetCurrentWindowID()
     DllCall(MoveWindowToDesktopNumberProc, UInt, activeHwnd, UInt, n-1)
 }
 
-_ChangeDesktop(n:=1) {
-    DllCall(GoToDesktopNumberProc, Int, n-1)
+_ChangeDesktop(n) {
+    DllCall(GoToDesktopNumberProc, Int, n - 1)
 }
 
 _CallWindowProc(proc, window:="") {
@@ -533,15 +578,15 @@ _RunProgram(program:="", settingName:="") {
     }
 }
 
-_RunProgramWhenSwitchingToDesktop(n:=1) {
+_RunProgramWhenSwitchingToDesktop(n) {
     _RunProgram(RunProgramWhenSwitchingToDesktop%n%, "[RunProgramWhenSwitchingToDesktop] " . n)
 }
 
-_RunProgramWhenSwitchingFromDesktop(n:=1) {
+_RunProgramWhenSwitchingFromDesktop(n) {
     _RunProgram(RunProgramWhenSwitchingFromDesktop%n%, "[RunProgramWhenSwitchingFromDesktop] " . n)
 }
 
-_ChangeBackground(n:=1) {
+_ChangeBackground(n) {
     line := Wallpapers%n%
     isHex := RegExMatch(line, "^0x([0-9A-Fa-f]{1,6})", hexMatchTotal)
     if (isHex) {
@@ -566,7 +611,7 @@ _ChangeBackground(n:=1) {
     }
 }
 
-_ChangeAppearance(n:=1) {
+_ChangeAppearance(n) {
     Menu, Tray, Tip, % _GetDesktopName(n)
     iconFile := Icons%n% ? Icons%n% : n . ".ico"
     if (FileExist(GeneralIconDir . iconFile)) {
@@ -578,32 +623,41 @@ _ChangeAppearance(n:=1) {
 }
 
 ; Only give focus to the foremost window if it has been requested.
-_FocusIfRequested() {
+_TryFocusIfRequested(n, failOnDesktopChange:=0) {
     if (doFocusAfterNextSwitch) {
-        _Focus()
-        doFocusAfterNextSwitch=0
+        success := _TryFocus(n, failOnDesktopChange)
+        if (success) {
+            doFocusAfterNextSwitch=0
+        }
+        return success
     }
+    return true
 }
 
 ; Give focus to the foremost window on the desktop.
-_Focus() {
-    foremostWindowId := _GetForemostWindowIdOnDesktop(_GetCurrentDesktopNumber())
+_TryFocus(n, failOnDesktopChange:=0) {
+    foremostWindowId := _TryGetForemostWindowIdOnDesktop(n, failOnDesktopChange)
+    if (foremostWindowId == -1 || failOnDesktopChange && n != _GetCurrentDesktopNumber()) {
+        return false
+    }
     WinActivate, ahk_id %foremostWindowId%
+    return true
 }
 
 ; Select the ahk_id of the foremost window in a given virtual desktop.
-_GetForemostWindowIdOnDesktop(n) {
-    ; Desktop count starts at 1 for this script, but at 0 for Windows.
-    n -= 1
-
+_TryGetForemostWindowIdOnDesktop(n, failOnDesktopChange:=0) {
     ; winIDList contains a list of windows IDs ordered from the top to the bottom for each desktop.
     WinGet winIDList, list
     Loop % winIDList {
         windowID := % winIDList%A_Index%
-        windowIsOnDesktop := DllCall(IsWindowOnDesktopNumberProc, UInt, WindowID, UInt, n)
+        ; Desktop count starts at 1 for this script, but at 0 for Windows, so n - 1 is used.
+        windowIsOnDesktop := DllCall(IsWindowOnDesktopNumberProc, UInt, WindowID, UInt, n - 1)
         ; Select the first (and foremost) window which is in the specified desktop.
         if (WindowIsOnDesktop == 1) {
             return WindowID
+        }
+        if (failOnDesktopChange && desktopSwitched) {
+            return -1
         }
     }
 }
@@ -620,7 +674,7 @@ _ShowTooltip(message:="") {
     Toast(params)
 }
 
-_ShowTooltipForDesktopSwitch(n:=1) {
+_ShowTooltipForDesktopSwitch(n) {
     _ShowTooltip(_GetDesktopName(n))
 }
 
