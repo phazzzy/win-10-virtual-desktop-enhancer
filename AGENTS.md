@@ -4,7 +4,7 @@ AutoHotkey utility for enhanced virtual desktop management on Windows, with auto
 
 ## Quick Reference
 
-- **Runtime:** AutoHotkey v1 script + prebuilt executable
+- **Runtime:** AutoHotkey v2 script
 - **Entrypoint:** `virtual-desktop-enhancer.ahk`
 - **Primary config:** `settings.ini`
 - **Critical behavior override:** when documentation and implementation diverge, treat code and recent commits as source of truth.
