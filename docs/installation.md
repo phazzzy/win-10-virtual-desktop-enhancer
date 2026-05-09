@@ -19,12 +19,12 @@ Click here to go back to the [README](../README.md).
 
 ## Prerequisites
 
-**This application only works on Windows 10 x64 (64 bit) systems** due to limitations in the library used to control the virtual desktops.  
-This is not something that can be changed or _fixed_ in any way.
+This application works on **Windows 10 x64 and Windows 11 x64**.  
+At startup, the script auto-detects the OS build and loads the matching VirtualDesktopAccessor DLL.
 
 For this app to work, you first might need to install "Visual C++ Redistributable for Visual Studio 2015". It should be available [here](https://www.microsoft.com/en-us/download/details.aspx?id=52685).
 
-Since [version 0.7.0](https://github.com/sdias/win-10-virtual-desktop-enhancer/releases/tag/0.7) this app will only work if your system has the "Windows 10 Anniversary" update (or later) installed.
+For Windows 10, your system must be new enough to support the VirtualDesktopAccessor integration used by this project.
 
 ## Procedure
 

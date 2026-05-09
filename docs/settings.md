@@ -45,7 +45,7 @@ The main settings are found in the `[General]` section of the `settings.ini` fil
 | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------  | ------------------------------------------ |
 | DefaultDesktop                                 | Which desktop will be used as default (The program will switch to this desktop when started). 0 means don't switch. | Any valid desktop number or 0              |
 | TaskbarScrollSwitching                         | If scrolling over the taskbar will switch desktops.                                                                 | `1`, `0` (Meaning YES and NO respectively) |
-| UseNativePrevNextDesktopSwitchingIfConflicting | Whether to switch between desktops instantly or with the default Windows transition if the shortcuts conflict.      | `1`, `0` (Meaning YES and NO respectively) |
+| UseNativeDesktopSwitching                       | Whether to use native Windows desktop switching when previous/next shortcuts conflict with OS shortcuts.            | `1`, `0` (Meaning YES and NO respectively) |
 | DesktopWrapping                                | If going right from the last desktop should take you to the first one and vice-versa.                               | `1`, `0` (Meaning YES and NO respectively) |
 | NumberOfCyclableDesktops                       | Limit the number of desktops that can be cycled with the previous/next desktop keys. 0 means cycle all desktops.    | The number of desktops to cycle            |
 | IconDir                                        | Directory path to look for icons in. (default: icons/)                                                              | A valid directory path                     |
@@ -133,7 +133,6 @@ You can customize the appearance of these tooltips by editing the settings in th
 | FontInBold                | If the font should be in bold.                                                            | `1`, `0` (Meaning YES and NO respectively)     |
 | BackgroundColor           | The color of the background.                                                              | Any hexadecimal number (from 0x0 to 0xFFFFFF)  |
 | Lifespan                  | The time in milliseconds for which each tooltip will be displayed.                        | Any reasonable number                          |
-| FadeOutAnimationDuration  | The duration of the FadeOut animation in milliseconds.                                    | Any resonable number (best if less than 500)   |
 | OnEveryMonitor            | If the tooltips should be shown on every monitor or just on the primary one.              | `1`, `0` (Meaning YES and NO respectively)     |
 
 ### Example configuration
@@ -150,11 +149,10 @@ FontColor=0xFFFFFF
 FontInBold=1
 BackgroundColor=0x1F1F1F
 Lifespan=750
-FadeOutAnimationDuration=100
 OnEveryMonitor=1
 ```
 
-This configuration causes tooltips to be drawn on every monitor at the center of the screen, in a white, bold and small font, with a dark background: they are shown for 750 milliseconds, then fade out with an animation during 100 milliseconds.
+This configuration causes tooltips to be drawn on every monitor at the center of the screen, in a white, bold and small font, with a dark background for 750 milliseconds.
 
 ## Keyboard shortcuts
 
@@ -165,7 +163,6 @@ The following are the actions that can be executed in the context of a virtual d
 - Switching to another desktop
 - Moving the current window to another desktop
 - Moving the current window to another desktop and then switch to that desktop
-- Do any of the actions above, but relative to the next 10 desktops instead (more details below)
 
 The following are the available context for those actions:
 
@@ -197,7 +194,7 @@ For example: if you want to set up a keyboard shortcut to be able to pin the cur
 
 This is a list of the available shortcuts.
 
-In addition to the configurable identifier keys, the number keys above the letters on your keyboard also act as identifier keys, and each targets a specific desktop (from Desktop 1 to 10, unless the "NextTenDesktops" modifier is pressed, which will make them target Desktop 11 to 20 instead).
+In addition to the configurable identifier keys, the number keys above the letters on your keyboard also act as identifier keys, and each targets a specific desktop (Desktop 1 to 9).
 
 Also note that if a setting is set to empty or not set at all, the feature corresponding to that setting will be disabled.
 
@@ -212,7 +209,6 @@ Separate modifier keys can be used with the previous/next desktop identifier key
 | SwitchDesktopNum                | Switch to desktop number X.                       |
 | MoveWindowToDesktopNum          | Move the current window to desktop number X.      |
 | MoveWindowAndSwitchToDesktopNum | Move the current window to desktop number X, and switch to it. |
-| NextTenDesktops                 | If doing any of the actions above, it instead targets the desktop that comes 10 desktops after that one (ex: Switch to desktop no. 13 instead of no. 3). Note that this modifier works together with the modifiers above. |
 | SwitchDesktopDir                | Switch to previous/next desktop.                  |
 | MoveWindowToDesktopDir          | Move the current window to previous/next desktop. |
 | MoveWindowAndSwitchToDesktopDir | Move the current window to previous/next desktop, and switch to it. |
@@ -225,16 +221,15 @@ Each _identifier_ keys' setting can be single key of your keyboard. They can be 
 | ---------------------------- | ------------------------------------------- |
 | PreviousDesktop              | Do the action for the previous desktop. |
 | NextDesktop                  | Do the action for the next desktop. |
-| Desktop1                     | Do the action for desktop 1 (or desktop 11 if the key for "NextTenDesktops" is being pressed). |
-| Desktop2                     | Do the action for desktop 2 (or desktop 12 if the key for "NextTenDesktops" is being pressed). |
-| Desktop3                     | Do the action for desktop 3 (or desktop 13 if the key for "NextTenDesktops" is being pressed). |
-| Desktop4                     | Do the action for desktop 4 (or desktop 14 if the key for "NextTenDesktops" is being pressed). |
-| Desktop5                     | Do the action for desktop 5 (or desktop 15 if the key for "NextTenDesktops" is being pressed). |
-| Desktop6                     | Do the action for desktop 6 (or desktop 16 if the key for "NextTenDesktops" is being pressed). |
-| Desktop7                     | Do the action for desktop 7 (or desktop 17 if the key for "NextTenDesktops" is being pressed). |
-| Desktop8                     | Do the action for desktop 8 (or desktop 18 if the key for "NextTenDesktops" is being pressed). |
-| Desktop9                     | Do the action for desktop 9 (or desktop 19 if the key for "NextTenDesktops" is being pressed). |
-| Desktop10                    | Do the action for desktop 10 (or desktop 20 if the key for "NextTenDesktops" is being pressed). |
+| Desktop1                     | Do the action for desktop 1. |
+| Desktop2                     | Do the action for desktop 2. |
+| Desktop3                     | Do the action for desktop 3. |
+| Desktop4                     | Do the action for desktop 4. |
+| Desktop5                     | Do the action for desktop 5. |
+| Desktop6                     | Do the action for desktop 6. |
+| Desktop7                     | Do the action for desktop 7. |
+| Desktop8                     | Do the action for desktop 8. |
+| Desktop9                     | Do the action for desktop 9. |
 | DesktopAlt1                  | Same as "Desktop1". Can be used as an alternative. |
 | DesktopAlt2                  | Same as "Desktop2". Can be used as an alternative. |
 | DesktopAlt3                  | Same as "Desktop3". Can be used as an alternative. |
@@ -244,7 +239,6 @@ Each _identifier_ keys' setting can be single key of your keyboard. They can be 
 | DesktopAlt7                  | Same as "Desktop7". Can be used as an alternative. |
 | DesktopAlt8                  | Same as "Desktop8". Can be used as an alternative. |
 | DesktopAlt9                  | Same as "Desktop9". Can be used as an alternative. |
-| DesktopAlt10                 | Same as "Desktop10". Can be used as an alternative. |
 
 #### Keyboard shortcuts combinations
 
@@ -259,6 +253,9 @@ _Combination_ keys' settings follow the same rules as [modifier keys' settings](
 | PinApp                       | Pin all of the windows of the currently opened app.           |
 | UnpinWindow                  | Unpin the current window.                                     |
 | UnpinApp                     | Unpin all of the windows of the currently opened app.         |
+| TogglePinOnTop               | Toggle always-on-top for the current window.                  |
+| PinOnTop                     | Set the current window to always-on-top.                      |
+| UnpinFromTop                 | Remove always-on-top from the current window.                 |
 | ChangeDesktopName            | Change the name of the current desktop with a popup prompt.   |
 
 ### Example configurations
@@ -274,7 +271,6 @@ With this configuration:
 SwitchDesktopNum=Win, Ctrl
 MoveWindowToDesktopNum=
 MoveWindowAndSwitchToDesktopNum=Win, Ctrl, Shift
-NextTenDesktops=
 SwitchDesktopDir=Win, Ctrl
 MoveWindowToDesktopDir=
 MoveWindowAndSwitchToDesktopDir=Win, Ctrl, Shift
@@ -282,6 +278,7 @@ MoveWindowAndSwitchToDesktopDir=Win, Ctrl, Shift
 [KeyboardShortcutsIdentifiers]
 PreviousDesktop=Left
 NextDesktop=Right
+LastActiveDesktop=
 Desktop1=1
 Desktop2=2
 Desktop3=3
@@ -291,7 +288,6 @@ Desktop6=6
 Desktop7=7
 Desktop8=8
 Desktop9=9
-Desktop10=0
 
 [KeyboardShortcutsCombinations]
 TogglePinWindow=Win, Ctrl, Shift, Q
@@ -300,6 +296,9 @@ PinWindow=
 PinApp=
 UnpinWindow=
 UnpinApp=
+TogglePinOnTop=
+PinOnTop=
+UnpinFromTop=
 ; "SC029" is the key below your "Esc" key
 OpenDesktopManager=LAlt, SC029
 ChangeDesktopName=Win, F2
@@ -309,21 +308,24 @@ The following shortcuts are available:
 
 | Description                                                                    | Keyboard Shortcut                            |
 | ------------------------------------------------------------------------------ | -------------------------------------------- |
-| Switch to desktop by number                                                    | Win + Ctrl + (0-9)                           |
+| Switch to desktop by number                                                    | Win + Ctrl + (1-9)                           |
 | Switch to next/previous desktop                                                | Win + Ctrl + (Left/Right Arrow)              |
 | Move the current window to desktop by number                                   | Disabled                                     |
 | Move the current window to next/previous desktop                               | Disabled                                     |
-| Move the current window to desktop by number and switch to it                  | Win + Ctrl + Shift + (0-9)                   |
+| Move the current window to desktop by number and switch to it                  | Win + Ctrl + Shift + (1-9)                   |
 | Move the current window to next/previous desktop and switch to it              | Win + Ctrl + Shift + (Left/Right Arrow)      |
-| Switch to desktop by number (desktops 11-20)                                   | Disabled                                     |
-| Move the current window to desktop by number (desktops 11-20)                  | Disabled                                     |
-| Move the current window to desktop by number and switch to it (desktops 11-20) | Disabled                                     |
+| Switch to last active desktop                                                   | Disabled                                     |
+| Move current window to last active desktop                                      | Disabled                                     |
+| Move current window to last active desktop and switch to it                     | Disabled                                     |
 | Pin/unpin (toggle) current <u>window</u>                                       | Win + Ctrl + Shift + Q                       |
 | Pin/unpin (toggle) current <u>app</u>                                          | Win + Ctrl + Shift + A                       |
 | Pin current window to all desktops                                             | Disabled                                     |
 | Pin current app to all desktops                                                | Disabled                                     |
 | Unpin current window from all desktops                                         | Disabled                                     |
 | Unpin current app from all desktops                                            | Disabled                                     |
+| Toggle current window always-on-top                                            | Disabled                                     |
+| Pin current window always-on-top                                               | Disabled                                     |
+| Unpin current window from always-on-top                                        | Disabled                                     |
 | Open Desktop Manager                                                           | Win + Ctrl + (key under Esc)                 |
 
 #### Custom configuration
@@ -334,7 +336,6 @@ With this configuration:
 SwitchDesktopNum=LAlt
 MoveWindowToDesktopNum=LAlt, Shift
 MoveWindowAndSwitchToDesktopNum=LAlt, Ctrl, Shift
-NextTenDesktops=Win
 SwitchDesktopDir=LAlt
 MoveWindowToDesktopDir=LAlt, Shift
 MoveWindowAndSwitchToDesktopDir=LAlt, Ctrl, Shift
@@ -351,7 +352,6 @@ Desktop6=6
 Desktop7=7
 Desktop8=8
 Desktop9=9
-Desktop10=0
 
 [KeyboardShortcutsCombinations]
 TogglePinWindow=
@@ -360,6 +360,10 @@ PinWindow=
 PinApp=
 UnpinWindow=
 UnpinApp=
+TogglePinOnTop=
+PinOnTop=
+UnpinFromTop=
+ChangeDesktopName=
 OpenDesktopManager=
 ```
 
@@ -367,21 +371,24 @@ The following shortcuts are available:
 
 | Description                                                                    | Keyboard Shortcut                             |
 | ------------------------------------------------------------------------------ | --------------------------------------------- |
-| Switch to desktop by number                                                    | Left Alt + (0-9)                              |
+| Switch to desktop by number                                                    | Left Alt + (1-9)                              |
 | Switch to next/previous desktop                                                | Left Alt + (Page Up/Page Down)                |
-| Move the current window to desktop by number                                   | Left Alt + Shift + (0-9)                      |
+| Move the current window to desktop by number                                   | Left Alt + Shift + (1-9)                      |
 | Move the current window to next/previous desktop                               | Left Alt + Shift + (Page Up/Page Down)        |
-| Move the current window to desktop by number and switch to it                  | Left Alt + Ctrl + Shift + (0-9)               |
+| Move the current window to desktop by number and switch to it                  | Left Alt + Ctrl + Shift + (1-9)               |
 | Move the current window to next/previous desktop and switch to it              | Left Alt + Ctrl + Shift + (Page Up/Page Down) |
-| Switch to desktop by number (desktops 11-20)                                   | Left Alt + Win + (0-9)                        |
-| Move the current window to desktop by number (desktops 11-20)                  | Left Alt + Shift + Win (0-9)                  |
-| Move the current window to desktop by number and switch to it (desktops 11-20) | Left Alt + Ctrl + Shift + Win (0-9)           |
+| Switch to last active desktop                                                   | Disabled                                      |
+| Move current window to last active desktop                                      | Disabled                                      |
+| Move current window to last active desktop and switch to it                     | Disabled                                      |
 | Pin/unpin (toggle) current <u>window</u>                                       | Disabled                                      |
 | Pin/unpin (toggle) current <u>app</u>                                          | Disabled                                      |
 | Pin current window to all desktops                                             | Disabled                                      |
 | Pin current app to all desktops                                                | Disabled                                      |
 | Unpin current window from all desktops                                         | Disabled                                      |
 | Unpin current app from all desktops                                            | Disabled                                      |
+| Toggle current window always-on-top                                            | Disabled                                      |
+| Pin current window always-on-top                                               | Disabled                                      |
+| Unpin current window from always-on-top                                        | Disabled                                      |
 | Open Desktop Manager                                                           | Disabled                                      |
 
 ## Run programs when switching desktops
@@ -417,23 +424,22 @@ If you then switch to the third desktop, it will run the "Close Outlook.bat" pro
 
 ## Tray Icon
 
-A new tray icon will be available while the program is running. It will state the number of the current desktop (1-10).  
-If you click on it the desktop management screen will be displayed.
+A new tray icon will be available while the program is running. It will state the number of the current desktop.
 
 ### Icon Packs
 
 By default the white text on black background icon pack is set, but more packs are available. They are subdirectories of the icons/ directory. To change between them set the IconDir setting to one of the subdirectories.
 
-To create personalized custom packs, simply create one icon per desktop and name them appropriately (`[desktop number goes here].ico`, ex: `1.ico`, `5.ico`, `99.ico`). If the current desktop does not have an icon for it, the `+.ico` icon is shown instead, so make sure you create that as well for your pack. 
+To create personalized custom packs, simply create one icon per desktop and name them appropriately (`[desktop number goes here].png`, ex: `1.png`, `5.png`, `99.png`). If the current desktop does not have an icon for it, the `+.png` icon is shown instead, so make sure you create that as well for your pack.
 
 The desktop number is used as the icon name by default, but you can also set custom icon filenames per desktop by setting icon filenames (relative to the IconDir) in the Icons section. Here is an example of a working configuration:
 
 ```ini
 [Icons]
-1=work.ico
-2=games.ico
-3=movies.ico
-4=presentations.ico
+1=work.png
+2=games.png
+3=movies.png
+4=presentations.png
 5=
 6=
 7=
@@ -456,7 +462,6 @@ Between version 0.9.1 and the following ones, the name and location of some sett
 | \[KeyboardShortcuts\] Switch        | \[KeyboardShortcutsModifiers\] SwitchDesktop                |
 | \[KeyboardShortcuts\] Move          | \[KeyboardShortcutsModifiers\] MoveWindowToDesktop          |
 | \[KeyboardShortcuts\] MoveAndSwitch | \[KeyboardShortcutsModifiers\] MoveWindowAndSwitchToDesktop |
-| \[KeyboardShortcuts\] PlusTen       | \[KeyboardShortcutsModifiers\] NextTenDesktops              |
 | \[KeyboardShortcuts\] Previous      | \[KeyboardShortcutsIdentifiers\] PreviousDesktop            |
 | \[KeyboardShortcuts\] Next          | \[KeyboardShortcutsIdentifiers\] NextDesktop                |
 
@@ -467,7 +472,6 @@ Old configuration:
 Switch=LAlt
 Move=LAlt, Shift, Ctrl
 MoveAndSwitch=LAlt, Shift
-PlusTen=
 Previous=Left
 Next=Right
 ```
@@ -479,7 +483,6 @@ New configuration (converted):
 SwitchDesktop=LAlt
 MoveWindowToDesktop=LAlt, Shift, Ctrl
 MoveWindowAndSwitchToDesktop=LAlt, Shift
-NextTenDesktops=
 
 [KeyboardShortcutsIdentifiers]
 PreviousDesktop=Left
