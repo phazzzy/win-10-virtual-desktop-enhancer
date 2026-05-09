@@ -21,7 +21,9 @@ DetectHiddenWindows, On
 hwnd := WinExist("ahk_pid " . DllCall("GetCurrentProcessId","Uint"))
 hwnd += 0x1000 << 32
 
-virtualDesktopAccessorDll := SubStr(A_OSVersion, 1, 2) == 11 ? "win-11.dll" : "win-10.dll"
+versionParts := StrSplit(A_OSVersion, ".")
+buildNumber := versionParts[3] ; 19045 — win 10. 20000 — win 11
+virtualDesktopAccessorDll := buildNumber >= 20000 ? "win-11.dll" : "win-10.dll"
 hVirtualDesktopAccessor := DllCall("LoadLibrary", "Str", A_ScriptDir . "\libraries\virtual-desktop-accessor\" . virtualDesktopAccessorDll, "Ptr")
 
 global GoToDesktopNumberProc					:= DllCall("GetProcAddress", Ptr, hVirtualDesktopAccessor, AStr, "GoToDesktopNumber", "Ptr")
@@ -128,11 +130,12 @@ DisableScript() {
 }
 
 EditConfig() {
-	Run notepad.exe "%A_ScriptDir%/settings.ini"
+    ; Run, notepad.exe "%A_ScriptDir%\settings.ini"
+    Run, % "rundll32.exe shell32.dll,ShellExec_RunDLL " A_ScriptDir "\settings.ini"
 }
 
 EditScript() {
-	Run notepad.exe "%A_ScriptDir%/virtual-desktop-enhancer.ahk"
+    Run, notepad.exe "%A_ScriptDir%\virtual-desktop-enhancer.ahk"
 }
 
 OpenExplorer() {
