@@ -51,6 +51,19 @@ The main settings are found in the `[General]` section of the `settings.ini` fil
 | NumberOfCyclableDesktops                       | Limit the number of desktops that can be cycled with the previous/next desktop keys. 0 means cycle all desktops.                                      | The number of desktops to cycle              |
 | IconDir                                        | Directory path to look for icons in. (default: icons/)                                                                                                | A valid directory path                       |
 
+### Tray menu runtime toggles
+
+The tray menu contains a `Settings` submenu with runtime toggles for:
+
+- `TaskbarScrollSwitching`
+- `TaskbarScrollBottomEdgeOnly`
+- `UseNativeDesktopSwitching`
+- `DesktopWrapping`
+- `Debug`
+- `Tooltips`
+
+These toggles are applied immediately at runtime and persisted to `settings.ini` right away. No manual reload is required.
+
 ### Taskbar scroll bottom-edge behavior
 
 `TaskbarScrollBottomEdgeOnly` changes how taskbar scrolling is detected:

@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.2] - 2026-05-10
+
+### Added
+- Runtime `Settings` submenu toggles in tray menu for:
+  - `TaskbarScrollSwitching`
+  - `TaskbarScrollBottomEdgeOnly`
+  - `UseNativeDesktopSwitching`
+  - `DesktopWrapping`
+  - `Debug`
+  - `Tooltips`
+
+### Changed
+- Tray menu structure refactored in `libraries/tray-renderer.ahk`:
+  - moved reload/open/edit/exit actions under `Script` submenu
+  - centralized menu state sync via `SyncMenuState()`.
+- `libraries/event-router.ahk` now applies and persists runtime toggle changes immediately through `VdeSettingsProvider`.
+- `libraries/settings-provider.ahk` now includes `SaveBool()` and `SaveInt()` helpers for persisting runtime settings updates.
+- `virtual-desktop-enhancer.ahk` now binds tray/router integration explicitly and enables dark tray menu theming with compatibility guards/fallbacks.
+- `docs/settings.md` updated with tray runtime toggle behavior documentation.
+
 ## [2.0.1] - 2026-05-09
 
 ### Added

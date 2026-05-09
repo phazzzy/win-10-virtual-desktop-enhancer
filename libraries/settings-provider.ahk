@@ -56,6 +56,15 @@ class VdeSettingsProvider {
         return s
     }
 
+    static SaveBool(settings, sec, key, value) {
+        normalized := value ? 1 : 0
+        IniWrite(normalized, settings.Path, sec, key)
+    }
+
+    static SaveInt(settings, sec, key, value) {
+        IniWrite(Integer(value), settings.Path, sec, key)
+    }
+
     static _Str(path, sec, key, def := "") {
         try v := IniRead(path, sec, key, def)
         catch

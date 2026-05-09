@@ -57,12 +57,48 @@ class VdeEventRouter {
     OnMoveAndShiftLastActivePress(*) => this.MoveAndSwitchToDesktop(this.App.PreviousDesktopNo)
 
     OnTaskbarScrollUp(*) {
-        if (!this.App.IsDisabled && this.Core.IsCursorHoveringTaskbar())
+        if (!this.App.IsDisabled && this.Settings.GeneralTaskbarScrollSwitching && this.Core.IsCursorHoveringTaskbar())
             this.OnShiftLeftPress()
     }
     OnTaskbarScrollDown(*) {
-        if (!this.App.IsDisabled && this.Core.IsCursorHoveringTaskbar())
+        if (!this.App.IsDisabled && this.Settings.GeneralTaskbarScrollSwitching && this.Core.IsCursorHoveringTaskbar())
             this.OnShiftRightPress()
+    }
+
+    ToggleMenuSetting(settingKey) {
+        switch settingKey {
+            case "TaskbarScrollSwitching":
+                this.Settings.GeneralTaskbarScrollSwitching := !this.Settings.GeneralTaskbarScrollSwitching
+                VdeSettingsProvider.SaveBool(this.Settings, "General", "TaskbarScrollSwitching", this.Settings.GeneralTaskbarScrollSwitching)
+            case "TaskbarScrollBottomEdgeOnly":
+                this.Settings.GeneralTaskbarScrollBottomEdgeOnly := !this.Settings.GeneralTaskbarScrollBottomEdgeOnly
+                VdeSettingsProvider.SaveBool(this.Settings, "General", "TaskbarScrollBottomEdgeOnly", this.Settings.GeneralTaskbarScrollBottomEdgeOnly)
+            case "UseNativeDesktopSwitching":
+                this.Settings.GeneralUseNativeDesktopSwitching := !this.Settings.GeneralUseNativeDesktopSwitching
+                VdeSettingsProvider.SaveBool(this.Settings, "General", "UseNativeDesktopSwitching", this.Settings.GeneralUseNativeDesktopSwitching)
+            case "DesktopWrapping":
+                this.Settings.GeneralDesktopWrapping := this.Settings.GeneralDesktopWrapping = 1 ? 0 : 1
+                VdeSettingsProvider.SaveInt(this.Settings, "General", "DesktopWrapping", this.Settings.GeneralDesktopWrapping)
+            case "Debug":
+                this.Settings.DebugEnabled := !this.Settings.DebugEnabled
+                VdeSettingsProvider.SaveBool(this.Settings, "Debug", "Enabled", this.Settings.DebugEnabled)
+                this._ApplyDebugRuntimeState()
+            case "Tooltips":
+                this.Settings.TooltipsEnabled := !this.Settings.TooltipsEnabled
+                VdeSettingsProvider.SaveBool(this.Settings, "Tooltips", "Enabled", this.Settings.TooltipsEnabled)
+            default:
+                this._Log("WARN", "settings_toggle_unknown", settingKey)
+                return
+        }
+
+        this.Tray.SyncMenuState(this.App.CurrentDesktopNo > 0 ? this.App.CurrentDesktopNo : this.App.InitialDesktopNo)
+        this._Log("INFO", "settings_toggled", settingKey)
+    }
+
+    _ApplyDebugRuntimeState() {
+        if (this.Logger = "")
+            return
+        this.Logger.Enabled := this.Settings.DebugEnabled
     }
 
     TogglePinWindow(*) {
