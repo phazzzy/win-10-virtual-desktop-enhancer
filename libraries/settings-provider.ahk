@@ -3,6 +3,8 @@ class VdeSettingsProvider {
         s := Map()
         s.Path := path
 
+        s.AppVersion := this._Str(path, "App", "Version", "0.0.0")
+
         s.GeneralDefaultDesktop := this._Int(path, "General", "DefaultDesktop", 1)
         s.GeneralTaskbarScrollSwitching := this._Bool(path, "General", "TaskbarScrollSwitching", true)
         s.GeneralTaskbarScrollBottomEdgeOnly := this._Bool(path, "General", "TaskbarScrollBottomEdgeOnly", false)

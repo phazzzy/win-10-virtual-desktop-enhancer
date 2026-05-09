@@ -12,9 +12,8 @@
 #Include %A_ScriptDir%\libraries\hotkey-registrar.ahk
 #Include %A_ScriptDir%\libraries\event-router.ahk
 
-global VDE_SCRIPT_VERSION := "2.0.0"
-
 global bootstrapSettings := VdeSettingsProvider.Load(A_ScriptDir "\settings.ini")
+global VDE_SCRIPT_VERSION := bootstrapSettings.AppVersion
 global logger := VdeLogger(A_ScriptDir, bootstrapSettings.DebugEnabled, bootstrapSettings.DebugVerbose)
 
 logger.Info("bootstrap", "startup_begin", "version=" VDE_SCRIPT_VERSION)
