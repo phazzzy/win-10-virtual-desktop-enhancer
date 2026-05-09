@@ -1,10 +1,12 @@
 class VdeCoreDomain {
-    __New(app, settings, gateway) {
+    __New(app, settings, gateway, logger := "") {
         this.App := app
         this.Settings := settings
         this.Gateway := gateway
+        this.Logger := logger
         this.App.NumDesktops := this.GetNumberOfDesktops()
         this.App.InitialDesktopNo := this.GetCurrentDesktopNumber()
+        this._Log("INFO", "domain_initialized", "desktops=" this.App.NumDesktops " initial=" this.App.InitialDesktopNo)
         Loop this.App.NumDesktops {
             this.App.DesktopNames[A_Index] := this.GetDesktopName(A_Index)
         }
@@ -47,6 +49,9 @@ class VdeCoreDomain {
     IsPinnedApp() => this.Gateway.IsPinnedApp(WinExist("A"))
 
     IsCursorHoveringTaskbar() {
+        if (this.Settings.GeneralTaskbarScrollBottomEdgeOnly)
+            return this.IsCursorOnBottomEdge()
+
         MouseGetPos(, &posY, &hoverId)
         if (this.App.TaskbarIds.Length = 0) {
             this.App.TaskbarIds.Push(WinExist("ahk_class Shell_TrayWnd"))
@@ -62,5 +67,37 @@ class VdeCoreDomain {
         onBottomEdge := h - y - posY - 1
         return (y = 0 && onBottomEdge = 0)
     }
-}
 
+    IsCursorOnBottomEdge() {
+        prevCoordMode := A_CoordModeMouse
+        CoordMode("Mouse", "Screen")
+        try {
+            MouseGetPos(&posX, &posY)
+
+            monitorCount := MonitorGetCount()
+            Loop monitorCount {
+                MonitorGet(A_Index, &monLeft, &monTop, &monRight, &monBottom)
+                isInsideX := (posX >= monLeft && posX < monRight)
+                isBottomPixel := (posY = monBottom - 1)
+                if (isInsideX && isBottomPixel)
+                    return true
+            }
+            return false
+        } finally {
+            CoordMode("Mouse", prevCoordMode)
+        }
+    }
+
+    _Log(level, event, details := "") {
+        if (this.Logger = "")
+            return
+        if (level = "ERROR")
+            this.Logger.Error("core-domain", event, details)
+        else if (level = "WARN")
+            this.Logger.Warn("core-domain", event, details)
+        else if (level = "DEBUG")
+            this.Logger.Debug("core-domain", event, details)
+        else
+            this.Logger.Info("core-domain", event, details)
+    }
+}

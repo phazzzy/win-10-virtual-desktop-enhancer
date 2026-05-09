@@ -1,9 +1,10 @@
 class VdeHotkeyRegistrar {
-    __New(app, settings, router, core) {
+    __New(app, settings, router, core, logger := "") {
         this.App := app
         this.Settings := settings
         this.Router := router
         this.Core := core
+        this.Logger := logger
     }
 
     RegisterAll() {
@@ -50,10 +51,24 @@ class VdeHotkeyRegistrar {
     _RegisterOne(hk, fn) {
         if (hk = "")
             return
-        try Hotkey(hk, fn)
-        catch {
-            throw Error("Invalid hotkey mapping: " hk)
+        try {
+            Hotkey(hk, fn)
+            this._Log("DEBUG", "hotkey_registered", hk)
+        } catch as err {
+            this._Log("ERROR", "hotkey_invalid", hk " | " err.Message)
         }
     }
-}
 
+    _Log(level, event, details := "") {
+        if (this.Logger = "")
+            return
+        if (level = "ERROR")
+            this.Logger.Error("hotkey-registrar", event, details)
+        else if (level = "WARN")
+            this.Logger.Warn("hotkey-registrar", event, details)
+        else if (level = "DEBUG")
+            this.Logger.Debug("hotkey-registrar", event, details)
+        else
+            this.Logger.Info("hotkey-registrar", event, details)
+    }
+}

@@ -41,14 +41,34 @@ Click here to go back to the [README](../README.md).
 
 The main settings are found in the `[General]` section of the `settings.ini` file and are used to define some basic settings of the program.  
 
-| Setting                                        | Description                                                                                                         | Valid Values                               |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------  | ------------------------------------------ |
-| DefaultDesktop                                 | Which desktop will be used as default (The program will switch to this desktop when started). 0 means don't switch. | Any valid desktop number or 0              |
-| TaskbarScrollSwitching                         | If scrolling over the taskbar will switch desktops.                                                                 | `1`, `0` (Meaning YES and NO respectively) |
-| UseNativeDesktopSwitching                       | Whether to use native Windows desktop switching when previous/next shortcuts conflict with OS shortcuts.            | `1`, `0` (Meaning YES and NO respectively) |
-| DesktopWrapping                                | If going right from the last desktop should take you to the first one and vice-versa.                               | `1`, `0` (Meaning YES and NO respectively) |
-| NumberOfCyclableDesktops                       | Limit the number of desktops that can be cycled with the previous/next desktop keys. 0 means cycle all desktops.    | The number of desktops to cycle            |
-| IconDir                                        | Directory path to look for icons in. (default: icons/)                                                              | A valid directory path                     |
+| Setting                                        | Description                                                                                                                                           | Valid Values                                 |
+| ---------------------------------------------- |-------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------|
+| DefaultDesktop                                 | Which desktop will be used as default (The program will switch to this desktop when started). 0 means don't switch.                                   | Any valid desktop number or 0                |
+| TaskbarScrollSwitching                         | If scrolling over the taskbar will switch desktops.                                                                                                   | `1`, `0` (Meaning YES and NO respectively)   |
+| TaskbarScrollBottomEdgeOnly                    | If taskbar scroll switching should trigger only when the cursor is on the bottom-most screen row (1 pixel). `0` keeps current taskbar-hover behavior. | `1`, `0` (Meaning YES and NO respectively)   |
+| UseNativeDesktopSwitching                      | Whether to use native Windows desktop switching when previous/next shortcuts conflict with OS shortcuts.                                              | `1`, `0` (Meaning YES and NO respectively)   |
+| DesktopWrapping                                | If going right from the last desktop should take you to the first one and vice-versa.                                                                 | `1`, `0` (Meaning YES and NO respectively)   |
+| NumberOfCyclableDesktops                       | Limit the number of desktops that can be cycled with the previous/next desktop keys. 0 means cycle all desktops.                                      | The number of desktops to cycle              |
+| IconDir                                        | Directory path to look for icons in. (default: icons/)                                                                                                | A valid directory path                       |
+
+### Taskbar scroll bottom-edge behavior
+
+`TaskbarScrollBottomEdgeOnly` changes how taskbar scrolling is detected:
+
+- `0` = old behavior: scrolling works when the cursor is over the taskbar area.
+- `1` = strict behavior: scrolling works only when the cursor is on the bottom-most pixel row of a monitor.
+
+This is useful when you often scroll in taskbar-adjacent UI and want to avoid accidental desktop switching.
+
+Example:
+
+```ini
+[General]
+TaskbarScrollSwitching=1
+TaskbarScrollBottomEdgeOnly=1
+```
+
+In multi-monitor setups with taskbars at the bottom, this rule is evaluated per monitor bottom edge.
 
 ## Custom wallpapers
 
@@ -112,9 +132,7 @@ Here is an example of a working configuration:
 6=
 7=
 8=
-9=
-10=
-15=No idea
+9=No idea
 ```
 
 ## Tooltips
@@ -204,32 +222,32 @@ Each _modifier_ keys' setting can be a combination of the `Ctrl`, `Shift`, `Alt`
 
 Separate modifier keys can be used with the previous/next desktop identifier keys versus the desktop number X identifier keys.
 
-| Name                            | Description                                       |
-| ------------------------------- | ------------------------------------------------- |
-| SwitchDesktopNum                | Switch to desktop number X.                       |
-| MoveWindowToDesktopNum          | Move the current window to desktop number X.      |
-| MoveWindowAndSwitchToDesktopNum | Move the current window to desktop number X, and switch to it. |
-| SwitchDesktopDir                | Switch to previous/next desktop.                  |
-| MoveWindowToDesktopDir          | Move the current window to previous/next desktop. |
+| Name                            | Description                                                         |
+| ------------------------------- |---------------------------------------------------------------------|
+| SwitchDesktopNum                | Switch to desktop number X.                                         |
+| MoveWindowToDesktopNum          | Move the current window to desktop number X.                        |
+| MoveWindowAndSwitchToDesktopNum | Move the current window to desktop number X, and switch to it.      |
+| SwitchDesktopDir                | Switch to previous/next desktop.                                    |
+| MoveWindowToDesktopDir          | Move the current window to previous/next desktop.                   |
 | MoveWindowAndSwitchToDesktopDir | Move the current window to previous/next desktop, and switch to it. |
 
 #### Keyboard shortcuts identifier keys
 
 Each _identifier_ keys' setting can be single key of your keyboard. They can be set to any value listed [in this page](https://autohotkey.com/docs/KeyList.htm#Keyboard) (except for keys already used as _modifiers_).
 
-| Name                         | Description                                 |
-| ---------------------------- | ------------------------------------------- |
-| PreviousDesktop              | Do the action for the previous desktop. |
-| NextDesktop                  | Do the action for the next desktop. |
-| Desktop1                     | Do the action for desktop 1. |
-| Desktop2                     | Do the action for desktop 2. |
-| Desktop3                     | Do the action for desktop 3. |
-| Desktop4                     | Do the action for desktop 4. |
-| Desktop5                     | Do the action for desktop 5. |
-| Desktop6                     | Do the action for desktop 6. |
-| Desktop7                     | Do the action for desktop 7. |
-| Desktop8                     | Do the action for desktop 8. |
-| Desktop9                     | Do the action for desktop 9. |
+| Name                         | Description                                        |
+| ---------------------------- |----------------------------------------------------|
+| PreviousDesktop              | Do the action for the previous desktop.            |
+| NextDesktop                  | Do the action for the next desktop.                |
+| Desktop1                     | Do the action for desktop 1.                       |
+| Desktop2                     | Do the action for desktop 2.                       |
+| Desktop3                     | Do the action for desktop 3.                       |
+| Desktop4                     | Do the action for desktop 4.                       |
+| Desktop5                     | Do the action for desktop 5.                       |
+| Desktop6                     | Do the action for desktop 6.                       |
+| Desktop7                     | Do the action for desktop 7.                       |
+| Desktop8                     | Do the action for desktop 8.                       |
+| Desktop9                     | Do the action for desktop 9.                       |
 | DesktopAlt1                  | Same as "Desktop1". Can be used as an alternative. |
 | DesktopAlt2                  | Same as "Desktop2". Can be used as an alternative. |
 | DesktopAlt3                  | Same as "Desktop3". Can be used as an alternative. |

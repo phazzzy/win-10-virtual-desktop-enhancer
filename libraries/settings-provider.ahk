@@ -5,11 +5,15 @@ class VdeSettingsProvider {
 
         s.GeneralDefaultDesktop := this._Int(path, "General", "DefaultDesktop", 1)
         s.GeneralTaskbarScrollSwitching := this._Bool(path, "General", "TaskbarScrollSwitching", true)
+        s.GeneralTaskbarScrollBottomEdgeOnly := this._Bool(path, "General", "TaskbarScrollBottomEdgeOnly", false)
         s.GeneralUseNativeDesktopSwitching := this._Bool(path, "General", "UseNativeDesktopSwitching", false)
         s.GeneralDesktopWrapping := this._Int(path, "General", "DesktopWrapping", 1)
         s.GeneralNumberOfCyclableDesktops := this._Int(path, "General", "NumberOfCyclableDesktops", 0)
         s.GeneralIconDir := this._Str(path, "General", "IconDir", "")
         s.GeneralIconDir := (s.GeneralIconDir = "") ? "icons/" : (SubStr(s.GeneralIconDir, -1) = "/" ? s.GeneralIconDir : s.GeneralIconDir "/")
+
+        s.DebugEnabled := this._Bool(path, "Debug", "Enabled", false)
+        s.DebugVerbose := this._Bool(path, "Debug", "Verbose", false)
 
         s.TooltipsEnabled := this._Bool(path, "Tooltips", "Enabled", false)
         s.TooltipsLifespan := this._Int(path, "Tooltips", "Lifespan", 750)
@@ -81,4 +85,3 @@ class VdeSettingsProvider {
         return out
     }
 }
-
