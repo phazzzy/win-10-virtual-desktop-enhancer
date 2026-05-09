@@ -5,6 +5,8 @@ class VdeEventRouter {
         this.Core := core
         this.Tray := tray
         this.Logger := logger
+        this.TaskbarScrollCooldownMs := 200
+        this.LastTaskbarScrollTick := 0
     }
 
     Initialize() {
@@ -57,12 +59,20 @@ class VdeEventRouter {
     OnMoveAndShiftLastActivePress(*) => this.MoveAndSwitchToDesktop(this.App.PreviousDesktopNo)
 
     OnTaskbarScrollUp(*) {
-        if (!this.App.IsDisabled && this.Settings.GeneralTaskbarScrollSwitching && this.Core.IsCursorHoveringTaskbar())
+        if (!this.App.IsDisabled && this.Settings.GeneralTaskbarScrollSwitching && this.Core.IsCursorHoveringTaskbar() && this._CanHandleTaskbarScroll())
             this.OnShiftLeftPress()
     }
     OnTaskbarScrollDown(*) {
-        if (!this.App.IsDisabled && this.Settings.GeneralTaskbarScrollSwitching && this.Core.IsCursorHoveringTaskbar())
+        if (!this.App.IsDisabled && this.Settings.GeneralTaskbarScrollSwitching && this.Core.IsCursorHoveringTaskbar() && this._CanHandleTaskbarScroll())
             this.OnShiftRightPress()
+    }
+
+    _CanHandleTaskbarScroll() {
+        now := A_TickCount
+        if (now - this.LastTaskbarScrollTick < this.TaskbarScrollCooldownMs)
+            return false
+        this.LastTaskbarScrollTick := now
+        return true
     }
 
     ToggleMenuSetting(settingKey) {
