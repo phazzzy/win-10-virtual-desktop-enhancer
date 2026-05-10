@@ -3,12 +3,16 @@
 #WinActivateForce
 #HotIf
 
+; --- Hotkey burst tuning (configured via settings.ini [General]) ---
+
+
 #Include %A_ScriptDir%\libraries\app-state.ahk
 #Include %A_ScriptDir%\libraries\logger.ahk
 #Include %A_ScriptDir%\libraries\accessor-gateway.ahk
 #Include %A_ScriptDir%\libraries\settings-provider.ahk
 #Include %A_ScriptDir%\libraries\core-domain.ahk
 #Include %A_ScriptDir%\libraries\tray-renderer.ahk
+#Include %A_ScriptDir%\libraries\overlay-tooltip.ahk
 #Include %A_ScriptDir%\libraries\hotkey-registrar.ahk
 #Include %A_ScriptDir%\libraries\event-router.ahk
 
@@ -24,11 +28,14 @@ global settings := bootstrapSettings
 global gateway := VdeAccessorGateway(A_ScriptDir, app, logger)
 global core := VdeCoreDomain(app, settings, gateway, logger)
 global tray := VdeTrayRenderer(app, settings, core, logger)
-global router := VdeEventRouter(app, settings, core, tray, logger)
+global overlayTooltip := VdeOverlayTooltip(logger)
+global router := VdeEventRouter(app, settings, core, tray, overlayTooltip, logger)
 tray.BindRouter(router)
 VdeEnableDarkTrayMenus()
 
 try {
+    VdeApplyHotkeyBurstTuning(settings)
+
     gateway.RegisterDesktopSwitchHook(router.OnDesktopSwitchMessage.Bind(router))
     tray.BuildInitial()
     router.Initialize()
@@ -40,6 +47,21 @@ try {
     logger.Error("bootstrap", "startup_failed", err.Message)
     TrayTip("Windows 10 Virtual Desktop Enhancer", "Startup failed: " err.Message)
     throw err
+}
+
+VdeApplyHotkeyBurstTuning(settings) {
+    if (!settings.GeneralHotkeyBurstTuningEnabled)
+        return
+
+    maxHotkeys := Integer(settings.GeneralMaxHotkeysPerInterval)
+    intervalMs := Integer(settings.GeneralHotkeyIntervalMs)
+
+    ; Keep values in safe ranges before assigning to built-in hotkey runtime controls.
+    maxHotkeys := Max(1, Min(1000, maxHotkeys))
+    intervalMs := Max(1, Min(60000, intervalMs))
+
+    A_MaxHotkeysPerInterval := maxHotkeys
+    A_HotkeyInterval := intervalMs
 }
 
 VdeEnableDarkTrayMenus() {

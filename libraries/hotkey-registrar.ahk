@@ -37,8 +37,10 @@ class VdeHotkeyRegistrar {
         this._RegisterOne(this.Settings.HkComboChangeDesktopName, this.Router.ChangeDesktopName.Bind(this.Router))
 
         if (this.Settings.GeneralTaskbarScrollSwitching) {
+            HotIf((*) => this._CanHandleWheelHotkeyContext())
             Hotkey("~WheelUp", this.Router.OnTaskbarScrollUp.Bind(this.Router))
             Hotkey("~WheelDown", this.Router.OnTaskbarScrollDown.Bind(this.Router))
+            HotIf()
         }
     }
 
@@ -57,6 +59,12 @@ class VdeHotkeyRegistrar {
         } catch as err {
             this._Log("ERROR", "hotkey_invalid", hk " | " err.Message)
         }
+    }
+
+    _CanHandleWheelHotkeyContext() {
+        if (this.App.IsDisabled || !this.Settings.GeneralTaskbarScrollSwitching)
+            return false
+        return this.Core.IsCursorHoveringTaskbar()
     }
 
     _Log(level, event, details := "") {

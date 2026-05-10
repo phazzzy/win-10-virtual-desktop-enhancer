@@ -7,6 +7,8 @@ class VdeCoreDomain {
         this.App.NumDesktops := this.GetNumberOfDesktops()
         this.App.InitialDesktopNo := this.GetCurrentDesktopNumber()
         this._Log("INFO", "domain_initialized", "desktops=" this.App.NumDesktops " initial=" this.App.InitialDesktopNo)
+        this._CacheTaskbarIds()
+        this._CacheMonitorBounds()
         Loop this.App.NumDesktops {
             this.App.DesktopNames[A_Index] := this.GetDesktopName(A_Index)
         }
@@ -53,12 +55,9 @@ class VdeCoreDomain {
             return this.IsCursorOnBottomEdge()
 
         MouseGetPos(, &posY, &hoverId)
-        if (this.App.TaskbarIds.Length = 0) {
-            this.App.TaskbarIds.Push(WinExist("ahk_class Shell_TrayWnd"))
-            ids := WinGetList("ahk_class Shell_SecondaryTrayWnd")
-            for _, id in ids
-                this.App.TaskbarIds.Push(id)
-        }
+        if (this.App.TaskbarIds.Length = 0)
+            this._CacheTaskbarIds()
+
         for _, id in this.App.TaskbarIds
             if (hoverId = id)
                 return true
@@ -74,17 +73,37 @@ class VdeCoreDomain {
         try {
             MouseGetPos(&posX, &posY)
 
-            monitorCount := MonitorGetCount()
-            Loop monitorCount {
-                MonitorGet(A_Index, &monLeft, &monTop, &monRight, &monBottom)
-                isInsideX := (posX >= monLeft && posX < monRight)
-                isBottomPixel := (posY = monBottom - 1)
+            if (!this.HasOwnProp("MonitorBounds") || this.MonitorBounds.Length = 0)
+                this._CacheMonitorBounds()
+
+            for _, mon in this.MonitorBounds {
+                isInsideX := (posX >= mon.Left && posX < mon.Right)
+                isBottomPixel := (posY = mon.Bottom - 1)
                 if (isInsideX && isBottomPixel)
                     return true
             }
             return false
         } finally {
             CoordMode("Mouse", prevCoordMode)
+        }
+    }
+
+    _CacheTaskbarIds() {
+        this.App.TaskbarIds := []
+        mainTaskbarId := WinExist("ahk_class Shell_TrayWnd")
+        if (mainTaskbarId)
+            this.App.TaskbarIds.Push(mainTaskbarId)
+        ids := WinGetList("ahk_class Shell_SecondaryTrayWnd")
+        for _, id in ids
+            this.App.TaskbarIds.Push(id)
+    }
+
+    _CacheMonitorBounds() {
+        this.MonitorBounds := []
+        monitorCount := MonitorGetCount()
+        Loop monitorCount {
+            MonitorGet(A_Index, &monLeft, &monTop, &monRight, &monBottom)
+            this.MonitorBounds.Push({ Left: monLeft, Top: monTop, Right: monRight, Bottom: monBottom })
         }
     }
 

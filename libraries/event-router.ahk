@@ -1,9 +1,10 @@
 class VdeEventRouter {
-    __New(app, settings, core, tray, logger := "") {
+    __New(app, settings, core, tray, overlayTooltip, logger := "") {
         this.App := app
         this.Settings := settings
         this.Core := core
         this.Tray := tray
+        this.OverlayTooltip := overlayTooltip
         this.Logger := logger
         this.TaskbarScrollCooldownMs := 200
         this.LastTaskbarScrollTick := 0
@@ -28,7 +29,20 @@ class VdeEventRouter {
         this.Tray.UpdateDesktopCheck(n)
         this.App.PreviousDesktopNo := this.App.CurrentDesktopNo
         this.App.CurrentDesktopNo := n
+        this._ShowDesktopTooltip(n)
         this._Log("INFO", "desktop_switched", "current=" this.App.CurrentDesktopNo " previous=" this.App.PreviousDesktopNo)
+    }
+
+    _ShowDesktopTooltip(n) {
+        if (!this.Settings.TooltipsEnabled) {
+            this._Log("DEBUG", "tooltip_skip", "reason=disabled desktop=" n)
+            return
+        }
+
+        text := this.Core.GetDesktopName(n)
+        this._Log("DEBUG", "tooltip_show_begin", "desktop=" n " text=" text)
+        this.OverlayTooltip.Show(text, this.Settings)
+        this._Log("DEBUG", "tooltip_show_done", "desktop=" n " via=overlay")
     }
 
     SwitchToDesktop(n) {
@@ -59,11 +73,11 @@ class VdeEventRouter {
     OnMoveAndShiftLastActivePress(*) => this.MoveAndSwitchToDesktop(this.App.PreviousDesktopNo)
 
     OnTaskbarScrollUp(*) {
-        if (!this.App.IsDisabled && this.Settings.GeneralTaskbarScrollSwitching && this.Core.IsCursorHoveringTaskbar() && this._CanHandleTaskbarScroll())
+        if (!this.App.IsDisabled && this.Settings.GeneralTaskbarScrollSwitching && this._CanHandleTaskbarScroll())
             this.OnShiftLeftPress()
     }
     OnTaskbarScrollDown(*) {
-        if (!this.App.IsDisabled && this.Settings.GeneralTaskbarScrollSwitching && this.Core.IsCursorHoveringTaskbar() && this._CanHandleTaskbarScroll())
+        if (!this.App.IsDisabled && this.Settings.GeneralTaskbarScrollSwitching && this._CanHandleTaskbarScroll())
             this.OnShiftRightPress()
     }
 

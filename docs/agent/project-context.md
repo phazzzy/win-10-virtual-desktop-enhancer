@@ -2,7 +2,7 @@
 
 ## Overview
 
-Windows 10 Virtual Desktop Enhancer is an AutoHotkey v1 utility that extends Windows virtual desktop workflows with keyboard shortcuts, tray UX, tooltip UX, per-desktop metadata, and optional automation hooks.
+Windows 10 Virtual Desktop Enhancer is an AutoHotkey v2 utility that extends Windows virtual desktop workflows with keyboard shortcuts, tray UX, tooltip UX, per-desktop metadata, and optional automation hooks.
 
 ## Source of Truth
 
@@ -14,11 +14,6 @@ When repository documentation and implementation diverge, prefer behavior define
 ## Runtime Architecture
 
 - Entrypoint script: `virtual-desktop-enhancer.ahk`
-- AHK v2 migration entrypoint: `virtual-desktop-enhancer.ahk`
-- Supporting libraries:
-  - `libraries/core.ahk`
-  - `libraries/read-ini.ahk`
-  - `libraries/tooltip.ahk`
 - AHK v2 modular architecture (`libraries/`):
   - `app-state.ahk` (shared runtime state)
   - `accessor-gateway.ahk` (DLL selection + typed accessor calls)
@@ -61,3 +56,11 @@ Key configurable domains include:
 - Desktop names and wallpapers
 - Tray icon/theme options
 - Hooks for running programs on desktop switches
+- Hotkey burst guard tuning (`HotkeyBurstTuningEnabled`, `MaxHotkeysPerInterval`, `HotkeyIntervalMs`)
+
+## Current Wheel Scroll Behavior
+
+- Wheel hotkeys are registered with runtime context gating via `HotIf(...)` in `libraries/hotkey-registrar.ahk`.
+- Context predicate uses `core-domain` cursor checks and disables wheel handlers outside the active taskbar/bottom-edge area.
+- Router handlers still enforce cooldown (`TaskbarScrollCooldownMs`) before switch actions.
+- Taskbar IDs and monitor bounds are cached in `core-domain` to reduce repeated per-event OS queries.

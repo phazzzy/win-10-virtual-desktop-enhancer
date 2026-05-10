@@ -41,15 +41,18 @@ Click here to go back to the [README](../README.md).
 
 The main settings are found in the `[General]` section of the `settings.ini` file and are used to define some basic settings of the program.  
 
-| Setting                                        | Description                                                                                                                                           | Valid Values                                 |
-| ---------------------------------------------- |-------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------|
-| DefaultDesktop                                 | Which desktop will be used as default (The program will switch to this desktop when started). 0 means don't switch.                                   | Any valid desktop number or 0                |
-| TaskbarScrollSwitching                         | If scrolling over the taskbar will switch desktops.                                                                                                   | `1`, `0` (Meaning YES and NO respectively)   |
-| TaskbarScrollBottomEdgeOnly                    | If taskbar scroll switching should trigger only when the cursor is on the bottom-most screen row (1 pixel). `0` keeps current taskbar-hover behavior. | `1`, `0` (Meaning YES and NO respectively)   |
-| UseNativeDesktopSwitching                      | Whether to use native Windows desktop switching when previous/next shortcuts conflict with OS shortcuts.                                              | `1`, `0` (Meaning YES and NO respectively)   |
-| DesktopWrapping                                | If going right from the last desktop should take you to the first one and vice-versa.                                                                 | `1`, `0` (Meaning YES and NO respectively)   |
-| NumberOfCyclableDesktops                       | Limit the number of desktops that can be cycled with the previous/next desktop keys. 0 means cycle all desktops.                                      | The number of desktops to cycle              |
-| IconDir                                        | Directory path to look for icons in. (default: icons/)                                                                                                | A valid directory path                       |
+| Setting                                      | Description                                                                                                                                           | Valid Values                                 |
+|----------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------|
+| DefaultDesktop                               | Which desktop will be used as default (The program will switch to this desktop when started). 0 means don't switch.                                   | Any valid desktop number or 0                |
+| TaskbarScrollSwitching                       | If scrolling over the taskbar will switch desktops.                                                                                                   | `1`, `0` (Meaning YES and NO respectively)   |
+| TaskbarScrollBottomEdgeOnly                  | If taskbar scroll switching should trigger only when the cursor is on the bottom-most screen row (1 pixel). `0` keeps current taskbar-hover behavior. | `1`, `0` (Meaning YES and NO respectively)   |
+| UseNativeDesktopSwitching                    | Whether to use native Windows desktop switching when previous/next shortcuts conflict with OS shortcuts.                                              | `1`, `0` (Meaning YES and NO respectively)   |
+| DesktopWrapping                              | If going right from the last desktop should take you to the first one and vice-versa.                                                                 | `1`, `0` (Meaning YES and NO respectively)   |
+| NumberOfCyclableDesktops                     | Limit the number of desktops that can be cycled with the previous/next desktop keys. 0 means cycle all desktops.                                      | The number of desktops to cycle              |
+| IconDir                                      | Directory path to look for icons in. (default: icons/)                                                                                                | A valid directory path                       |
+| HotkeyBurstTuningEnabled                     | Enables applying AutoHotkey burst protection tuning values at startup.                                                                                | `1`, `0` (Meaning YES and NO respectively)   |
+| MaxHotkeysPerInterval                        | Value assigned to AutoHotkey `A_MaxHotkeysPerInterval` on startup when tuning is enabled.                                                             | Positive integer                             |
+| HotkeyIntervalMs                             | Value assigned to AutoHotkey `A_HotkeyInterval` (milliseconds) on startup when tuning is enabled.                                                     | Positive integer                             |
 
 ### Tray menu runtime toggles
 
@@ -79,6 +82,9 @@ Example:
 [General]
 TaskbarScrollSwitching=1
 TaskbarScrollBottomEdgeOnly=1
+HotkeyBurstTuningEnabled=1
+MaxHotkeysPerInterval=140
+HotkeyIntervalMs=1000
 ```
 
 In multi-monitor setups with taskbars at the bottom, this rule is evaluated per monitor bottom edge.

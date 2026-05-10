@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.3] - 2026-05-10
+
+### Added
+- New `[General]` runtime tuning keys in `settings.ini`:
+  - `HotkeyBurstTuningEnabled`
+  - `MaxHotkeysPerInterval`
+  - `HotkeyIntervalMs`
+
+### Changed
+- Wheel scroll hotkeys are now context-gated with `HotIf(...)` in `libraries/hotkey-registrar.ahk`, reducing global wheel handler activations outside taskbar/bottom-edge trigger zones.
+- Taskbar/monitor detection path was optimized in `libraries/core-domain.ahk` by caching taskbar window IDs and monitor bounds.
+- Wheel route checks were streamlined in `libraries/event-router.ahk` to avoid duplicated cursor-area evaluation in the router layer.
+- Startup now applies AutoHotkey burst tuning from loaded settings in `virtual-desktop-enhancer.ahk` via `VdeApplyHotkeyBurstTuning(settings)`.
+- Burst tuning application in `virtual-desktop-enhancer.ahk` is now executed inside startup `try/catch`, so runtime assignment errors follow the existing controlled startup failure path.
+- `VdeApplyHotkeyBurstTuning(settings)` now clamps hotkey burst runtime values before assignment (`A_MaxHotkeysPerInterval`: `1..1000`, `A_HotkeyInterval`: `1..60000`).
+- `libraries/settings-provider.ahk` now loads hotkey burst tuning keys with defensive defaults (`140` / `1000ms`).
+- Documentation aligned with current runtime/config behavior:
+  - `docs/settings.md`
+  - `docs/agent/project-context.md`
+  - `docs/agent/code-changes.md`
+  - `docs/agent/config-and-compatibility.md`
+
 ## [2.0.2] - 2026-05-10
 
 ### Added
