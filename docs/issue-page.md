@@ -7,7 +7,7 @@
 - [Issue page](#issue-page)
     - [Table of contents](#table-of-contents)
     - [Issue page: what is it?](#issue-page-what-is-it)
-    - [Windows 10 Virtual Desktop Enhancer's issue page](#windows-10-virtual-desktop-enhancers-issue-page)
+    - [Windows 11 Virtual Desktop Enhancer's issue page](#windows-11-virtual-desktop-enhancers-issue-page)
     - [When should I open a new issue?](#when-should-i-open-a-new-issue)
     - [What to include in the issue?](#what-to-include-in-the-issue)
         - [Example of an useless issue](#example-of-an-useless-issue)
@@ -22,9 +22,9 @@ Click here to go back to the [README](../README.md).
 The _Issue page_ of a project is a service on GitHub which, despite its name, lets the users and  the developers of a project communicate easily about pretty much anything related to the project itself.  
 Its main use is to submit bugs and problem found while using the program, but, depending on the project and its administrators it can also be used to ask for new features in next releases, ask questions and receive help.
 
-## Windows 10 Virtual Desktop Enhancer's issue page
+## Windows 11 Virtual Desktop Enhancer's issue page
 
-[Here](https://github.com/sdias/win-10-virtual-desktop-enhancer/issues/) you can find Windows 10 Virtual Desktop Enhancer's Issue page.  
+[Here](https://github.com/sdias/win-10-virtual-desktop-enhancer/issues/) you can find Windows 11 Virtual Desktop Enhancer's Issue page.
 If you open that link you will find a list of open issues (which have not been solved yet) and old closed (solved) issues as well.
 
 ## When should I open a new issue?

@@ -193,7 +193,7 @@ This configuration causes tooltips to be drawn on every monitor at the center of
 
 ## Keyboard shortcuts
 
-Windows 10 Virtual Desktop Enhancer allows you to configure your own keyboard shortcuts to perform various actions.  A shortcut is composed of an action part and a context part.
+Windows 11 Virtual Desktop Enhancer allows you to configure your own keyboard shortcuts to perform various actions.  A shortcut is composed of an action part and a context part.
 
 The following are the actions that can be executed in the context of a virtual desktop:
 

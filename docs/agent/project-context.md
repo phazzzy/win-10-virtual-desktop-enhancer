@@ -2,7 +2,7 @@
 
 ## Overview
 
-Windows 10 Virtual Desktop Enhancer is an AutoHotkey v2 utility that extends Windows virtual desktop workflows with keyboard shortcuts, tray UX, tooltip UX, per-desktop metadata, and optional automation hooks.
+Windows 11 Virtual Desktop Enhancer is an AutoHotkey v2 utility that extends Windows virtual desktop workflows with keyboard shortcuts, tray UX, tooltip UX, per-desktop metadata, and optional automation hooks, while preserving backward compatibility with Windows 10.
 
 ## Source of Truth
 

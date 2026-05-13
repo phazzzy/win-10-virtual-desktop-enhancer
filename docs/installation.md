@@ -19,7 +19,7 @@ Click here to go back to the [README](../README.md).
 
 ## Prerequisites
 
-This application works on **Windows 10 x64 and Windows 11 x64**.  
+This application works on **Windows 11 x64** with backward compatibility for **Windows 10 x64**.  
 At startup, the script auto-detects the OS build and loads the matching VirtualDesktopAccessor DLL.
 
 For this app to work, you first might need to install "Visual C++ Redistributable for Visual Studio 2015". It should be available [here](https://www.microsoft.com/en-us/download/details.aspx?id=52685).
@@ -28,7 +28,7 @@ For Windows 10, your system must be new enough to support the VirtualDesktopAcce
 
 ## Procedure
 
-Windows 10 Virtual Desktop Enhancer does not need to be installed: simply download [the latest version](https://github.com/sdias/win-10-virtual-desktop-enhancer/releases/latest) and extract it into a folder in your computer.  
+Windows 11 Virtual Desktop Enhancer does not need to be installed: simply download [the latest version](https://github.com/sdias/win-10-virtual-desktop-enhancer/releases/latest) and extract it into a folder in your computer.  
 Once you have downloaded it you can run it just by executing `virtual-desktop-enhancer.exe` in the folder where you extracted it.
 
 Alternatively you can install [AutoHotkey](https://autohotkey.com/) and run the `virtual-desktop-enhancer.ahk` script file instead.
@@ -62,10 +62,10 @@ Please try the first procedure: if it does not work try the second one.
 10. In the Properties dialog you can check "Run with highest privileges" in the "General" tab if your account has administrative rights and you want to run the program as administrator
 11. In the "Conditions" tab you probably want to uncheck **both** "Stop if the computer switches to battery power" and "Start the task only if the computer is on AC power" if you are tunning this on a laptop
 12. In the "Settings" tab you might want to uncheck "Stop the task if it runs longer than..."
-13. You can now close the window: if you restart the computer Windows 10 Virtual Desktop Enhancer should start automatically
+13. You can now close the window: if you restart the computer Windows 11 Virtual Desktop Enhancer should start automatically
 
 ## Request assistance
 
-If you have problems with the installation of Windows 10 Virtual Desktop Enhancer please submit a new issue in the project page as described [here](issue-page.md).
+If you have problems with the installation of Windows 11 Virtual Desktop Enhancer please submit a new issue in the project page as described [here](issue-page.md).
 
 Click here to go back to the [README](../README.md).

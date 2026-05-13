@@ -45,7 +45,7 @@ try {
     logger.Info("bootstrap", "startup_ready")
 } catch as err {
     logger.Error("bootstrap", "startup_failed", err.Message)
-    TrayTip("Windows 10 Virtual Desktop Enhancer", "Startup failed: " err.Message)
+    TrayTip("Windows 11 Virtual Desktop Enhancer", "Startup failed: " err.Message)
     throw err
 }
 
@@ -55,6 +55,13 @@ VdeApplyHotkeyBurstTuning(settings) {
 
     maxHotkeys := Integer(settings.GeneralMaxHotkeysPerInterval)
     intervalMs := Integer(settings.GeneralHotkeyIntervalMs)
+
+    ; If either value is <= 0, disable AutoHotkey burst warning and rely on app-level throttling.
+    if (maxHotkeys <= 0 || intervalMs <= 0) {
+        A_MaxHotkeysPerInterval := 2147483647
+        A_HotkeyInterval := 0
+        return
+    }
 
     ; Keep values in safe ranges before assigning to built-in hotkey runtime controls.
     maxHotkeys := Max(1, Min(1000, maxHotkeys))

@@ -77,7 +77,7 @@ class VdeTrayRenderer {
     ToggleDisabled() {
         this.App.IsDisabled := !this.App.IsDisabled
         this.SyncMenuState(this.App.CurrentDesktopNo > 0 ? this.App.CurrentDesktopNo : this.App.InitialDesktopNo)
-        TrayTip("Windows 10 Virtual Desktop Enhancer", this.App.IsDisabled ? "Disabled" : "Enabled")
+        TrayTip("Windows 11 Virtual Desktop Enhancer", this.App.IsDisabled ? "Disabled" : "Enabled")
         this._Log("INFO", "toggle_disabled", "value=" this.App.IsDisabled)
     }
 

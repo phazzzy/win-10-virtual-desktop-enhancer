@@ -14,7 +14,7 @@ For a complete list of all the issues reported for this project visit [this page
         - [Programs run as another user](#programs-run-as-another-user)
         - [Remote Desktop Protocol](#remote-desktop-protocol)
         - [Synergy and AutoHotkey](#synergy-and-autohotkey)
-        - [Windows 10 Game Bar](#windows-10-game-bar)
+        - [Windows Game Bar](#windows-game-bar)
 
 <!-- /TOC -->
 
@@ -23,14 +23,14 @@ Click here to go back to the [README](../README.md).
 ### Programs run as another user
 
 **Problem**:  
-Windows 10 Virtual Desktop Enhancer can have some difficulties when interacting with windows which are run with higher rights than the program itself.  
+Windows 11 Virtual Desktop Enhancer can have some difficulties when interacting with windows which are run with higher rights than the program itself.
 [This comment on issue #21](https://github.com/sdias/win-10-virtual-desktop-enhancer/issues/21#issuecomment-308504500) collects what is known about the interaction between this program and other programs run as other users; most importantly:
 
-- When running as a normal user Windows 10 Virtual Desktop Enhancer will not work when a program run as another user is focused
-- If your account is an administrator you should experience no problem at all, still if you do you can run WIndows 10 VIrtual Desktop Enhancer as administrator to solve those issues
+- When running as a normal user Windows 11 Virtual Desktop Enhancer will not work when a program run as another user is focused
+- If your account is an administrator you should experience no problem at all, still if you do you can run Windows 11 Virtual Desktop Enhancer as administrator to solve those issues
 
 **Workaround**:  
-While no definitive solution to these problems can be provided as they are related to an external library used by this project, a simple workaround is to run Windows 10 Virtual Desktop Enhancer with administrative rights.  
+While no definitive solution to these problems can be provided as they are related to an external library used by this project, a simple workaround is to run Windows 11 Virtual Desktop Enhancer with administrative rights.
 If you want to test this workaround follow these steps:
 
 - Right click on the executable or on the link
@@ -61,7 +61,7 @@ There is no solution or workaround for this issue: if you experience similar pro
 **Solution**:  
 There is no solution or workaround for this issue even though many more similar issues regarding conflicts between these two programs can be found on the internet.
 
-### Windows 10 Game Bar
+### Windows Game Bar
 
 **Problem**:  
 In [issue 57](https://github.com/sdias/win-10-virtual-desktop-enhancer/issues/57) an user reported how certain hotkeys in certain situations triggered a popup from Windows asking whether or not to start the Game Bar.  

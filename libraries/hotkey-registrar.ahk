@@ -38,8 +38,8 @@ class VdeHotkeyRegistrar {
 
         if (this.Settings.GeneralTaskbarScrollSwitching) {
             HotIf((*) => this._CanHandleWheelHotkeyContext())
-            Hotkey("~WheelUp", this.Router.OnTaskbarScrollUp.Bind(this.Router))
-            Hotkey("~WheelDown", this.Router.OnTaskbarScrollDown.Bind(this.Router))
+            Hotkey("WheelUp", this.Router.OnTaskbarScrollUp.Bind(this.Router))
+            Hotkey("WheelDown", this.Router.OnTaskbarScrollDown.Bind(this.Router))
             HotIf()
         }
     }

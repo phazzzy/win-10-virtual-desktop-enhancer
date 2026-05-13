@@ -1,4 +1,4 @@
-# Windows 10 Virtual Desktop Enhancer
+# Windows 11 Virtual Desktop Enhancer
 
 AutoHotkey utility for enhanced virtual desktop management on Windows, with automatic accessor DLL selection for Windows 10/11.
 

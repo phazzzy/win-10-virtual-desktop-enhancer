@@ -12,11 +12,9 @@ class VdeEventRouter {
 
     Initialize() {
         this._Log("INFO", "router_initialize")
-        if (this.Settings.GeneralDefaultDesktop > 0 && this.Settings.GeneralDefaultDesktop != this.App.InitialDesktopNo) {
-            this.SwitchToDesktop(this.Settings.GeneralDefaultDesktop)
-        } else {
-            this.OnDesktopSwitch(this.App.InitialDesktopNo)
-        }
+        ; Keep user on the currently active desktop at startup.
+        ; Current desktop is detected earlier by core-domain and stored in App.InitialDesktopNo.
+        this.OnDesktopSwitch(this.App.InitialDesktopNo)
     }
 
     OnDesktopSwitchMessage(wParam, lParam, msg, hwnd) {
