@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.4] - 2026-05-13
+
+### Changed
+- Startup now keeps the currently active desktop instead of forcing a switch to `GeneralDefaultDesktop` during initialization.
+- Hotkey burst guard logic now supports disabling AutoHotkey burst warnings when tuning values are non-positive, relying on app-level throttling.
+- Taskbar wheel hotkeys now handle scroll switching directly (without pass-through `~`).
+- Application naming was updated to **Windows 11 Virtual Desktop Enhancer** across UI strings and documentation, with explicit Windows 10 backward compatibility notes.
+- Default configuration now ships with `Debug.Enabled=0` and `Tooltips.Enabled=0` in `settings.ini`.
+- Bundled `virtual-desktop-enhancer.exe` was refreshed to match updated runtime/config behavior.
+
 ## [2.0.3] - 2026-05-10
 
 ### Added
