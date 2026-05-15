@@ -8,6 +8,7 @@ class VdeEventRouter {
         this.Logger := logger
         this.TaskbarScrollCooldownMs := 200
         this.LastTaskbarScrollTick := 0
+        this._TaskbarRefreshSeq := 0
     }
 
     Initialize() {
@@ -24,9 +25,12 @@ class VdeEventRouter {
     OnDesktopSwitch(n) {
         if (this.App.IsDisabled)
             return
+        if (n = this.App.CurrentDesktopNo)
+            return
         this.Tray.UpdateDesktopCheck(n)
         this.App.PreviousDesktopNo := this.App.CurrentDesktopNo
         this.App.CurrentDesktopNo := n
+        this._AfterDesktopSwitchHack()
         this._ShowDesktopTooltip(n)
         this._Log("INFO", "desktop_switched", "current=" this.App.CurrentDesktopNo " previous=" this.App.PreviousDesktopNo)
     }
@@ -45,6 +49,7 @@ class VdeEventRouter {
 
     SwitchToDesktop(n) {
         if (!this.App.IsDisabled) {
+            this._DefocusActiveWindowBeforeSwitch()
             this._Log("DEBUG", "switch_to_desktop", "target=" n)
             this.Core.ChangeDesktop(n)
         }
@@ -61,6 +66,43 @@ class VdeEventRouter {
             this.Core.MoveCurrentWindowToDesktop(n)
             this.Core.ChangeDesktop(n)
         }
+    }
+
+    _AfterDesktopSwitchHack() {
+        if (!this.Settings.GeneralTaskbarAntiFlickerRefreshOnSwitch)
+            return
+
+        this._TaskbarRefreshSeq += 1
+        seq := this._TaskbarRefreshSeq
+        debounceMs := Max(20, Integer(this.Settings.GeneralTaskbarAntiFlickerRefreshDebounceMs))
+        secondPhaseMs := Max(debounceMs, Integer(this.Settings.GeneralTaskbarAntiFlickerRefreshSecondPhaseMs))
+
+        SetTimer((*) => this._RunTaskbarRefreshPhase(seq, 1), -debounceMs)
+        SetTimer((*) => this._RunTaskbarRefreshPhase(seq, 2), -secondPhaseMs)
+    }
+
+    _DefocusActiveWindowBeforeSwitch() {
+        if (!this.Settings.GeneralTaskbarAntiFlickerDefocusBeforeSwitch)
+            return
+
+        try {
+            ; Shift-based move-and-switch path bypasses this method and keeps normal window focus behavior.
+            ; For plain switching, move focus to taskbar to avoid active app activation race during desktop transition.
+            if WinExist("ahk_class Shell_TrayWnd")
+                WinActivate("ahk_class Shell_TrayWnd")
+            this._Log("DEBUG", "anti_flicker_defocus_applied")
+        } catch {
+            this._Log("WARN", "anti_flicker_defocus_failed")
+        }
+    }
+
+    _RunTaskbarRefreshPhase(seq, phase) {
+        if (seq != this._TaskbarRefreshSeq)
+            return
+        if (VdeSoftRefreshTaskbar())
+            this._Log("DEBUG", "anti_flicker_taskbar_refresh", "phase=" phase)
+        else
+            this._Log("WARN", "anti_flicker_taskbar_refresh_failed", "phase=" phase)
     }
 
     OnShiftLeftPress(*) => this.SwitchToDesktop(this.Core.GetPreviousDesktopNumber())

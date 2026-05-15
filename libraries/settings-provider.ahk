@@ -16,6 +16,10 @@ class VdeSettingsProvider {
         s.GeneralHotkeyBurstTuningEnabled := this._Bool(path, "General", "HotkeyBurstTuningEnabled", true)
         s.GeneralMaxHotkeysPerInterval := this._Int(path, "General", "MaxHotkeysPerInterval", 140)
         s.GeneralHotkeyIntervalMs := this._Int(path, "General", "HotkeyIntervalMs", 1000)
+        s.GeneralTaskbarAntiFlickerRefreshOnSwitch := this._Bool(path, "General", "TaskbarAntiFlickerRefreshOnSwitch", false)
+        s.GeneralTaskbarAntiFlickerRefreshDebounceMs := this._Int(path, "General", "TaskbarAntiFlickerRefreshDebounceMs", 90)
+        s.GeneralTaskbarAntiFlickerRefreshSecondPhaseMs := this._Int(path, "General", "TaskbarAntiFlickerRefreshSecondPhaseMs", 180)
+        s.GeneralTaskbarAntiFlickerDefocusBeforeSwitch := this._Bool(path, "General", "TaskbarAntiFlickerDefocusBeforeSwitch", true)
 
         s.DebugEnabled := this._Bool(path, "Debug", "Enabled", false)
         s.DebugVerbose := this._Bool(path, "Debug", "Verbose", false)

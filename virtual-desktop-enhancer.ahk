@@ -99,3 +99,28 @@ VdeEnableDarkTrayMenus() {
         DllCall(flushMenuThemes)
     }
 }
+
+VdeSoftRefreshTaskbar() {
+    WM_SETTINGCHANGE := 0x001A
+    HWND_BROADCAST := 0xFFFF
+    SMTO_ABORTIFHUNG := 0x0002
+    timeoutMs := 150
+
+    try {
+        result := 0
+        ok := DllCall(
+            "User32.dll\SendMessageTimeoutW",
+            "Ptr", HWND_BROADCAST,
+            "UInt", WM_SETTINGCHANGE,
+            "Ptr", 0,
+            "Str", "TraySettings",
+            "UInt", SMTO_ABORTIFHUNG,
+            "UInt", timeoutMs,
+            "Ptr*", &result,
+            "Ptr"
+        )
+        return ok != 0
+    } catch {
+        return false
+    }
+}
