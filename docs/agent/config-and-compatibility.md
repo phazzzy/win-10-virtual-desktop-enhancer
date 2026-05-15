@@ -72,8 +72,6 @@ Note: Other tooltip keys currently remain compatibility/user-doc surface in `set
 #### `[KeyboardShortcutsModifiers]`
 
 - `SwitchDesktopNum` -> `hotkey-mods-string`
-- `MoveWindowToDesktopNum` -> `hotkey-mods-string`
-- `MoveWindowAndSwitchToDesktopNum` -> `hotkey-mods-string`
 - `SwitchDesktopDir` -> `hotkey-mods-string`
 - `MoveWindowToDesktopDir` -> `hotkey-mods-string`
 - `MoveWindowAndSwitchToDesktopDir` -> `hotkey-mods-string`

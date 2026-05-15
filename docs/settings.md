@@ -244,8 +244,7 @@ Separate modifier keys can be used with the previous/next desktop identifier key
 | Name                            | Description                                                         |
 | ------------------------------- |---------------------------------------------------------------------|
 | SwitchDesktopNum                | Switch to desktop number X.                                         |
-| MoveWindowToDesktopNum          | Move the current window to desktop number X.                        |
-| MoveWindowAndSwitchToDesktopNum | Move the current window to desktop number X, and switch to it.      |
+| Shift + SwitchDesktopNum        | Move active window to desktop number X and switch to that desktop.  |
 | SwitchDesktopDir                | Switch to previous/next desktop.                                    |
 | MoveWindowToDesktopDir          | Move the current window to previous/next desktop.                   |
 | MoveWindowAndSwitchToDesktopDir | Move the current window to previous/next desktop, and switch to it. |
@@ -306,8 +305,6 @@ With this configuration:
 ```ini
 [KeyboardShortcutsModifiers]
 SwitchDesktopNum=Win, Ctrl
-MoveWindowToDesktopNum=
-MoveWindowAndSwitchToDesktopNum=Win, Ctrl, Shift
 SwitchDesktopDir=Win, Ctrl
 MoveWindowToDesktopDir=
 MoveWindowAndSwitchToDesktopDir=Win, Ctrl, Shift
@@ -371,8 +368,6 @@ With this configuration:
 ```ini
 [KeyboardShortcutsModifiers]
 SwitchDesktopNum=LAlt
-MoveWindowToDesktopNum=LAlt, Shift
-MoveWindowAndSwitchToDesktopNum=LAlt, Ctrl, Shift
 SwitchDesktopDir=LAlt
 MoveWindowToDesktopDir=LAlt, Shift
 MoveWindowAndSwitchToDesktopDir=LAlt, Ctrl, Shift

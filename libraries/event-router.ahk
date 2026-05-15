@@ -50,11 +50,14 @@ class VdeEventRouter {
         }
     }
     MoveToDesktop(n) {
-        if (!this.App.IsDisabled)
+        if (!this.App.IsDisabled) {
+            this._Log("DEBUG", "move_to_desktop", "target=" n)
             this.Core.MoveCurrentWindowToDesktop(n)
+        }
     }
     MoveAndSwitchToDesktop(n) {
         if (!this.App.IsDisabled) {
+            this._Log("DEBUG", "move_and_switch_to_desktop", "target=" n)
             this.Core.MoveCurrentWindowToDesktop(n)
             this.Core.ChangeDesktop(n)
         }

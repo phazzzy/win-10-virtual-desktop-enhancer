@@ -23,9 +23,8 @@ class VdeHotkeyRegistrar {
         Loop 9 {
             i := A_Index
             for _, id in [this.Settings.DesktopIdentifiers[i], this.Settings.DesktopAltIdentifiers[i]] {
-                this._RegisterNumbered(this.Settings.HkModifiersSwitchNum . id, i, (n, *) => this.Router.SwitchToDesktop(n))
-                this._RegisterNumbered(this.Settings.HkModifiersMoveNum . id, i, (n, *) => this.Router.MoveToDesktop(n))
-                this._RegisterNumbered(this.Settings.HkModifiersMoveAndSwitchNum . id, i, (n, *) => this.Router.MoveAndSwitchToDesktop(n))
+                for _, normalizedId in this._ExpandNumberedIdentifierVariants(id)
+                    this._RegisterNumbered(this.Settings.HkModifiersSwitchNum . normalizedId, i)
             }
         }
 
@@ -44,10 +43,47 @@ class VdeHotkeyRegistrar {
         }
     }
 
-    _RegisterNumbered(hk, n, fn) {
+    _RegisterNumbered(hk, n) {
         if (hk = "")
             return
-        this._RegisterOne(hk, (*) => fn(n))
+        this._RegisterOne("*" hk, (*) => this._HandleNumberedDesktopHotkey(n, hk))
+    }
+
+    _HandleNumberedDesktopHotkey(n, hk) {
+        shiftPressed := GetKeyState("Shift", "P")
+        this._Log("DEBUG", "numbered_hotkey_pressed", "hotkey=" hk " target=" n " shiftPressed=" (shiftPressed ? "1" : "0"))
+        if (shiftPressed)
+            this.Router.MoveAndSwitchToDesktop(n)
+        else
+            this.Router.SwitchToDesktop(n)
+    }
+
+    _ExpandNumberedIdentifierVariants(id) {
+        variants := []
+        if (id = "")
+            return variants
+
+        variants.Push(id)
+
+        numpadMap := Map(
+            "Numpad1", "NumpadEnd",
+            "Numpad2", "NumpadDown",
+            "Numpad3", "NumpadPgDn",
+            "Numpad4", "NumpadLeft",
+            "Numpad5", "NumpadClear",
+            "Numpad6", "NumpadRight",
+            "Numpad7", "NumpadHome",
+            "Numpad8", "NumpadUp",
+            "Numpad9", "NumpadPgUp"
+        )
+
+        if (numpadMap.Has(id)) {
+            altId := numpadMap[id]
+            variants.Push(altId)
+            this._Log("DEBUG", "numbered_hotkey_variant_added", "source=" id " variant=" altId)
+        }
+
+        return variants
     }
 
     _RegisterOne(hk, fn) {

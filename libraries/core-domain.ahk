@@ -42,7 +42,16 @@ class VdeCoreDomain {
     }
 
     ChangeDesktop(n) => this.Gateway.GoToDesktopNumber(n)
-    MoveCurrentWindowToDesktop(n) => this.Gateway.MoveWindowToDesktopNumber(WinExist("A"), n)
+    MoveCurrentWindowToDesktop(n) {
+        hwnd := WinExist("A")
+        if (!hwnd) {
+            this._Log("WARN", "move_window_skip", "reason=no_active_window target=" n)
+            return
+        }
+        this._Log("DEBUG", "move_window_begin", "target=" n " hwnd=" hwnd)
+        this.Gateway.MoveWindowToDesktopNumber(hwnd, n)
+        this._Log("DEBUG", "move_window_done", "target=" n " hwnd=" hwnd)
+    }
     PinWindow() => this.Gateway.PinWindow(WinExist("A"))
     UnpinWindow() => this.Gateway.UnPinWindow(WinExist("A"))
     IsPinnedWindow() => this.Gateway.IsPinnedWindow(WinExist("A"))

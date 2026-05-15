@@ -38,8 +38,6 @@ class VdeSettingsProvider {
         s.TooltipsMinHeight := this._Int(path, "Tooltips", "MinHeight", 72)
 
         s.HkModifiersSwitchNum := this._NormMods(this._Str(path, "KeyboardShortcutsModifiers", "SwitchDesktopNum", ""))
-        s.HkModifiersMoveNum := this._NormMods(this._Str(path, "KeyboardShortcutsModifiers", "MoveWindowToDesktopNum", ""))
-        s.HkModifiersMoveAndSwitchNum := this._NormMods(this._Str(path, "KeyboardShortcutsModifiers", "MoveWindowAndSwitchToDesktopNum", ""))
         s.HkModifiersSwitchDir := this._NormMods(this._Str(path, "KeyboardShortcutsModifiers", "SwitchDesktopDir", ""))
         s.HkModifiersMoveDir := this._NormMods(this._Str(path, "KeyboardShortcutsModifiers", "MoveWindowToDesktopDir", ""))
         s.HkModifiersMoveAndSwitchDir := this._NormMods(this._Str(path, "KeyboardShortcutsModifiers", "MoveWindowAndSwitchToDesktopDir", ""))
