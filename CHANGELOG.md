@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.5] - 2026-05-15
+
+### Added
+- New anti-flicker desktop switching controls in `settings.ini`:
+  - `TaskbarAntiFlickerDefocusBeforeSwitch`
+  - `TaskbarAntiFlickerRefreshOnSwitch`
+  - `TaskbarAntiFlickerRefreshDebounceMs`
+  - `TaskbarAntiFlickerRefreshSecondPhaseMs`
+- Optional pre-switch defocus path for plain desktop switching to reduce active-window activation races.
+
+### Changed
+- Taskbar flicker mitigation during rapid desktop switching was improved with a soft refresh strategy and two-phase refresh timing.
+- Numbered desktop hotkey handling was unified for more consistent behavior across key variants.
+- `settings.ini` now includes concise inline comments for key runtime settings and shortcut sections.
+- Version source in `settings.ini` was bumped to `2.0.5`.
+
 ## [2.0.4] - 2026-05-13
 
 ### Changed
