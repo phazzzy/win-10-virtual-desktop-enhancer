@@ -22,25 +22,22 @@ global logger := VdeLogger(A_ScriptDir, bootstrapSettings.DebugEnabled, bootstra
 
 logger.Info("bootstrap", "startup_begin", "version=" VDE_SCRIPT_VERSION)
 
-global app := VdeAppState()
-app.Logger := logger
-global settings := bootstrapSettings
-global gateway := VdeAccessorGateway(A_ScriptDir, app, logger)
-global core := VdeCoreDomain(app, settings, gateway, logger)
-global tray := VdeTrayRenderer(app, settings, core, logger)
-global overlayTooltip := VdeOverlayTooltip(logger)
-global router := VdeEventRouter(app, settings, core, tray, overlayTooltip, logger)
-tray.BindRouter(router)
-VdeEnableDarkTrayMenus()
-
 try {
+	global app := VdeAppState()
+	app.Logger := logger
+	global settings := bootstrapSettings
+	global gateway := VdeAccessorGateway(A_ScriptDir, app, logger)
+	global core := VdeCoreDomain(app, settings, gateway, logger)
+	global tray := VdeTrayRenderer(app, settings, core, logger)
+	global overlayTooltip := VdeOverlayTooltip(logger)
+	global router := VdeEventRouter(app, settings, core, tray, overlayTooltip, logger)
+	registrar := VdeHotkeyRegistrar(app, settings, router, core, logger)
+	tray.BindRouter(router)
+	VdeEnableDarkTrayMenus()
     VdeApplyHotkeyBurstTuning(settings)
-
     gateway.RegisterDesktopSwitchHook(router.OnDesktopSwitchMessage.Bind(router))
     tray.BuildInitial()
     router.Initialize()
-
-    registrar := VdeHotkeyRegistrar(app, settings, router, core, logger)
     registrar.RegisterAll()
     logger.Info("bootstrap", "startup_ready")
 } catch as err {

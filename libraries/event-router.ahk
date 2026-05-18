@@ -140,6 +140,12 @@ class VdeEventRouter {
             case "TaskbarScrollBottomEdgeOnly":
                 this.Settings.GeneralTaskbarScrollBottomEdgeOnly := !this.Settings.GeneralTaskbarScrollBottomEdgeOnly
                 VdeSettingsProvider.SaveBool(this.Settings, "General", "TaskbarScrollBottomEdgeOnly", this.Settings.GeneralTaskbarScrollBottomEdgeOnly)
+            case "TaskbarAntiFlickerDefocusBeforeSwitch":
+                this.Settings.GeneralTaskbarAntiFlickerDefocusBeforeSwitch := !this.Settings.GeneralTaskbarAntiFlickerDefocusBeforeSwitch
+                VdeSettingsProvider.SaveBool(this.Settings, "General", "TaskbarAntiFlickerDefocusBeforeSwitch", this.Settings.GeneralTaskbarAntiFlickerDefocusBeforeSwitch)
+            case "TaskbarAntiFlickerRefreshOnSwitch":
+                this.Settings.GeneralTaskbarAntiFlickerRefreshOnSwitch := !this.Settings.GeneralTaskbarAntiFlickerRefreshOnSwitch
+                VdeSettingsProvider.SaveBool(this.Settings, "General", "TaskbarAntiFlickerRefreshOnSwitch", this.Settings.GeneralTaskbarAntiFlickerRefreshOnSwitch)
             case "UseNativeDesktopSwitching":
                 this.Settings.GeneralUseNativeDesktopSwitching := !this.Settings.GeneralUseNativeDesktopSwitching
                 VdeSettingsProvider.SaveBool(this.Settings, "General", "UseNativeDesktopSwitching", this.Settings.GeneralUseNativeDesktopSwitching)

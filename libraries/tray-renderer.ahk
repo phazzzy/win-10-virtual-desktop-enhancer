@@ -5,12 +5,13 @@ class VdeTrayRenderer {
         this.Core := core
         this.Logger := logger
         this.Router := ""
-        this.SettingsMenu := ""
+        this.ScriptMenu := ""
         this.MenuKeys := Map(
             "EnableKeys", "Enable shortcuts",
-            "Settings", "Settings",
             "TaskbarScrollSwitching", "Taskbar scroll switching",
             "TaskbarScrollBottomEdgeOnly", "Taskbar bottom edge only",
+            "TaskbarAntiFlickerDefocusBeforeSwitch", "Taskbar anti-flicker: defocus before switch",
+            "TaskbarAntiFlickerRefreshOnSwitch", "Taskbar anti-flicker: refresh on switch",
             "UseNativeDesktopSwitching", "Use native desktop switching",
             "DesktopWrapping", "Desktop wrapping",
             "Debug", "Debug logging",
@@ -25,7 +26,6 @@ class VdeTrayRenderer {
     BuildInitial() {
         this._Log("INFO", "tray_build_begin")
         A_TrayMenu.Delete()
-        this._BuildSettingsSection()
         this._BuildScriptSection()
         this._BuildDesktopsSection()
 
@@ -38,39 +38,29 @@ class VdeTrayRenderer {
     _BuildDesktopsSection() {
         this.App.DesktopMenuItems := Map()
         Loop this.App.NumDesktops {
-            i := A_Index
-            name := this.Core.GetDesktopName(i)
-            this.App.DesktopMenuItems[i] := name
-            A_TrayMenu.Add(name, (*) => this.SwitchToDesktop(i))
+            desktopNo := A_Index
+            name := this.Core.GetDesktopName(desktopNo)
+            this.App.DesktopMenuItems[desktopNo] := name
+            A_TrayMenu.Add(name, ObjBindMethod(this, "SwitchToDesktop", desktopNo))
         }
-        A_TrayMenu.Add()
-    }
-
-    _BuildSettingsSection() {
-        this.SettingsMenu := Menu()
-        this.SettingsMenu.Add(this.MenuKeys["EnableKeys"], (*) => this.ToggleDisabled())
-        this.SettingsMenu.Add()
-        this.SettingsMenu.Add(this.MenuKeys["TaskbarScrollSwitching"], (*) => this._ToggleSetting("TaskbarScrollSwitching"))
-        this.SettingsMenu.Add(this.MenuKeys["TaskbarScrollBottomEdgeOnly"], (*) => this._ToggleSetting("TaskbarScrollBottomEdgeOnly"))
-        this.SettingsMenu.Add(this.MenuKeys["UseNativeDesktopSwitching"], (*) => this._ToggleSetting("UseNativeDesktopSwitching"))
-        this.SettingsMenu.Add(this.MenuKeys["DesktopWrapping"], (*) => this._ToggleSetting("DesktopWrapping"))
-        this.SettingsMenu.Add(this.MenuKeys["Debug"], (*) => this._ToggleSetting("Debug"))
-        this.SettingsMenu.Add(this.MenuKeys["Tooltips"], (*) => this._ToggleSetting("Tooltips"))
-        A_TrayMenu.Add(this.MenuKeys["Settings"], this.SettingsMenu)
-        A_TrayMenu.Add()
     }
 
     _BuildScriptSection() {
-        scriptMenu := Menu()
-        scriptMenu.Add("Reload", (*) => Reload())
-        scriptMenu.Default := "Reload"
-        scriptMenu.Add()
-        scriptMenu.Add("Open in explorer", (*) => Run(A_ScriptDir))
-        scriptMenu.Add("Edit script", (*) => Run('notepad.exe "' A_ScriptDir '\virtual-desktop-enhancer.ahk"'))
-        scriptMenu.Add("Edit config", (*) => Run("rundll32.exe shell32.dll,ShellExec_RunDLL " A_ScriptDir "\\settings.ini"))
-        scriptMenu.Add()
-        scriptMenu.Add("Exit", (*) => ExitApp())
-        A_TrayMenu.Add("Script", scriptMenu)
+        this.ScriptMenu := Menu()
+        this.ScriptMenu.Add(this.MenuKeys["TaskbarScrollSwitching"], (*) => this._ToggleSetting("TaskbarScrollSwitching"))
+        this.ScriptMenu.Add(this.MenuKeys["TaskbarScrollBottomEdgeOnly"], (*) => this._ToggleSetting("TaskbarScrollBottomEdgeOnly"))
+        this.ScriptMenu.Add(this.MenuKeys["TaskbarAntiFlickerDefocusBeforeSwitch"], (*) => this._ToggleSetting("TaskbarAntiFlickerDefocusBeforeSwitch"))
+        this.ScriptMenu.Add(this.MenuKeys["TaskbarAntiFlickerRefreshOnSwitch"], (*) => this._ToggleSetting("TaskbarAntiFlickerRefreshOnSwitch"))
+        this.ScriptMenu.Add(this.MenuKeys["UseNativeDesktopSwitching"], (*) => this._ToggleSetting("UseNativeDesktopSwitching"))
+        this.ScriptMenu.Add(this.MenuKeys["DesktopWrapping"], (*) => this._ToggleSetting("DesktopWrapping"))
+        this.ScriptMenu.Add(this.MenuKeys["Debug"], (*) => this._ToggleSetting("Debug"))
+        this.ScriptMenu.Add(this.MenuKeys["Tooltips"], (*) => this._ToggleSetting("Tooltips"))
+        this.ScriptMenu.Add()
+        this.ScriptMenu.Add(this.MenuKeys["EnableKeys"], (*) => this.ToggleDisabled())
+        this.ScriptMenu.Add("Reload", (*) => Reload())
+        this.ScriptMenu.Add("Exit", (*) => ExitApp())
+        this.ScriptMenu.Default := "Enable shortcuts"
+        A_TrayMenu.Add("Script", this.ScriptMenu)
         A_TrayMenu.Add()
     }
 
@@ -87,9 +77,20 @@ class VdeTrayRenderer {
         this.Router.ToggleMenuSetting(settingKey)
     }
 
-    SwitchToDesktop(n) {
-        if (!this.App.IsDisabled)
-            this.Core.ChangeDesktop(n)
+    SwitchToDesktop(n, *) {
+        this._Log("INFO", "tray_switch_request", "target=" n " disabled=" this.App.IsDisabled)
+
+        if (this.App.IsDisabled) {
+            this._Log("DEBUG", "tray_switch_ignored", "reason=disabled target=" n)
+            return
+        }
+
+        if (n < 1 || n > this.App.NumDesktops) {
+            this._Log("WARN", "tray_switch_rejected", "reason=out_of_range target=" n " desktops=" this.App.NumDesktops)
+            return
+        }
+
+        this.Core.ChangeDesktop(n)
     }
 
     UpdateDesktopCheck(n) {
@@ -103,13 +104,15 @@ class VdeTrayRenderer {
         if (currentDesktopNo > 0 && this.App.DesktopMenuItems.Has(currentDesktopNo))
             A_TrayMenu.Check(this.App.DesktopMenuItems[currentDesktopNo])
 
-        this._SetSettingsMenuChecked(this.MenuKeys["EnableKeys"], !this.App.IsDisabled)
-        this._SetSettingsMenuChecked(this.MenuKeys["TaskbarScrollSwitching"], this.Settings.GeneralTaskbarScrollSwitching)
-        this._SetSettingsMenuChecked(this.MenuKeys["TaskbarScrollBottomEdgeOnly"], this.Settings.GeneralTaskbarScrollBottomEdgeOnly)
-        this._SetSettingsMenuChecked(this.MenuKeys["UseNativeDesktopSwitching"], this.Settings.GeneralUseNativeDesktopSwitching)
-        this._SetSettingsMenuChecked(this.MenuKeys["DesktopWrapping"], this.Settings.GeneralDesktopWrapping = 1)
-        this._SetSettingsMenuChecked(this.MenuKeys["Debug"], this.Settings.DebugEnabled)
-        this._SetSettingsMenuChecked(this.MenuKeys["Tooltips"], this.Settings.TooltipsEnabled)
+        this._SetScriptMenuChecked(this.MenuKeys["EnableKeys"], !this.App.IsDisabled)
+        this._SetScriptMenuChecked(this.MenuKeys["TaskbarScrollSwitching"], this.Settings.GeneralTaskbarScrollSwitching)
+        this._SetScriptMenuChecked(this.MenuKeys["TaskbarScrollBottomEdgeOnly"], this.Settings.GeneralTaskbarScrollBottomEdgeOnly)
+        this._SetScriptMenuChecked(this.MenuKeys["TaskbarAntiFlickerDefocusBeforeSwitch"], this.Settings.GeneralTaskbarAntiFlickerDefocusBeforeSwitch)
+        this._SetScriptMenuChecked(this.MenuKeys["TaskbarAntiFlickerRefreshOnSwitch"], this.Settings.GeneralTaskbarAntiFlickerRefreshOnSwitch)
+        this._SetScriptMenuChecked(this.MenuKeys["UseNativeDesktopSwitching"], this.Settings.GeneralUseNativeDesktopSwitching)
+        this._SetScriptMenuChecked(this.MenuKeys["DesktopWrapping"], this.Settings.GeneralDesktopWrapping = 1)
+        this._SetScriptMenuChecked(this.MenuKeys["Debug"], this.Settings.DebugEnabled)
+        this._SetScriptMenuChecked(this.MenuKeys["Tooltips"], this.Settings.TooltipsEnabled)
     }
 
     _SetMenuChecked(itemLabel, isChecked) {
@@ -119,13 +122,13 @@ class VdeTrayRenderer {
             A_TrayMenu.Uncheck(itemLabel)
     }
 
-    _SetSettingsMenuChecked(itemLabel, isChecked) {
-        if (this.SettingsMenu = "")
+    _SetScriptMenuChecked(itemLabel, isChecked) {
+        if (this.ScriptMenu = "")
             return
         if (isChecked)
-            this.SettingsMenu.Check(itemLabel)
+            this.ScriptMenu.Check(itemLabel)
         else
-            this.SettingsMenu.Uncheck(itemLabel)
+            this.ScriptMenu.Uncheck(itemLabel)
     }
 
     UpdateTrayIcon(n) {
