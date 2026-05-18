@@ -19,6 +19,19 @@ class VdeLogger {
             this._Write("DEBUG", component, event, details)
     }
 
+    static Dispatch(logger, component, level, event, details := "") {
+        if (logger = "")
+            return
+        if (level = "ERROR")
+            logger.Error(component, event, details)
+        else if (level = "WARN")
+            logger.Warn(component, event, details)
+        else if (level = "DEBUG")
+            logger.Debug(component, event, details)
+        else
+            logger.Info(component, event, details)
+    }
+
     _EnsureLogDir() {
         if !DirExist(this.LogDir)
             DirCreate(this.LogDir)

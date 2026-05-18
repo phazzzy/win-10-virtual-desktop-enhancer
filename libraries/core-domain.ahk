@@ -117,15 +117,6 @@ class VdeCoreDomain {
     }
 
     _Log(level, event, details := "") {
-        if (this.Logger = "")
-            return
-        if (level = "ERROR")
-            this.Logger.Error("core-domain", event, details)
-        else if (level = "WARN")
-            this.Logger.Warn("core-domain", event, details)
-        else if (level = "DEBUG")
-            this.Logger.Debug("core-domain", event, details)
-        else
-            this.Logger.Info("core-domain", event, details)
+        VdeLogger.Dispatch(this.Logger, "core-domain", level, event, details)
     }
 }

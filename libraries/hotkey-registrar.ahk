@@ -104,15 +104,6 @@ class VdeHotkeyRegistrar {
     }
 
     _Log(level, event, details := "") {
-        if (this.Logger = "")
-            return
-        if (level = "ERROR")
-            this.Logger.Error("hotkey-registrar", event, details)
-        else if (level = "WARN")
-            this.Logger.Warn("hotkey-registrar", event, details)
-        else if (level = "DEBUG")
-            this.Logger.Debug("hotkey-registrar", event, details)
-        else
-            this.Logger.Info("hotkey-registrar", event, details)
+        VdeLogger.Dispatch(this.Logger, "hotkey-registrar", level, event, details)
     }
 }

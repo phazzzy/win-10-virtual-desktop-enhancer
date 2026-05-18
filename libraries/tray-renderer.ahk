@@ -149,15 +149,6 @@ class VdeTrayRenderer {
     }
 
     _Log(level, event, details := "") {
-        if (this.Logger = "")
-            return
-        if (level = "ERROR")
-            this.Logger.Error("tray-renderer", event, details)
-        else if (level = "WARN")
-            this.Logger.Warn("tray-renderer", event, details)
-        else if (level = "DEBUG")
-            this.Logger.Debug("tray-renderer", event, details)
-        else
-            this.Logger.Info("tray-renderer", event, details)
+        VdeLogger.Dispatch(this.Logger, "tray-renderer", level, event, details)
     }
 }

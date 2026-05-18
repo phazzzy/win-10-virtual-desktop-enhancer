@@ -1,11 +1,13 @@
 class VdeEventRouter {
-    __New(app, settings, core, tray, overlayTooltip, logger := "") {
+    __New(app, settings, core, tray, overlayTooltip, logger := "", runtime := "", settingsToggleService := "") {
         this.App := app
         this.Settings := settings
         this.Core := core
         this.Tray := tray
         this.OverlayTooltip := overlayTooltip
         this.Logger := logger
+        this.Runtime := runtime
+        this.SettingsToggleService := settingsToggleService
         this.TaskbarScrollCooldownMs := 200
         this.LastTaskbarScrollTick := 0
         this._TaskbarRefreshSeq := 0
@@ -99,7 +101,12 @@ class VdeEventRouter {
     _RunTaskbarRefreshPhase(seq, phase) {
         if (seq != this._TaskbarRefreshSeq)
             return
-        if (VdeSoftRefreshTaskbar())
+        if (this.Runtime = "" || !this.Runtime.HasMethod("SoftRefreshTaskbar")) {
+            this._Log("WARN", "anti_flicker_taskbar_refresh_skipped", "reason=runtime_unavailable phase=" phase)
+            return
+        }
+        refreshOk := this.Runtime.SoftRefreshTaskbar()
+        if (refreshOk)
             this._Log("DEBUG", "anti_flicker_taskbar_refresh", "phase=" phase)
         else
             this._Log("WARN", "anti_flicker_taskbar_refresh_failed", "phase=" phase)
@@ -133,6 +140,18 @@ class VdeEventRouter {
     }
 
     ToggleMenuSetting(settingKey) {
+        if (this.SettingsToggleService != "") {
+            if (!this.SettingsToggleService.Toggle(settingKey)) {
+                this._Log("WARN", "settings_toggle_unknown", settingKey)
+                return
+            }
+            if (settingKey = "Debug")
+                this._ApplyDebugRuntimeState()
+            this.Tray.SyncMenuState(this.App.CurrentDesktopNo > 0 ? this.App.CurrentDesktopNo : this.App.InitialDesktopNo)
+            this._Log("INFO", "settings_toggled", settingKey)
+            return
+        }
+
         switch settingKey {
             case "TaskbarScrollSwitching":
                 this.Settings.GeneralTaskbarScrollSwitching := !this.Settings.GeneralTaskbarScrollSwitching
@@ -202,15 +221,6 @@ class VdeEventRouter {
     }
 
     _Log(level, event, details := "") {
-        if (this.Logger = "")
-            return
-        if (level = "ERROR")
-            this.Logger.Error("event-router", event, details)
-        else if (level = "WARN")
-            this.Logger.Warn("event-router", event, details)
-        else if (level = "DEBUG")
-            this.Logger.Debug("event-router", event, details)
-        else
-            this.Logger.Info("event-router", event, details)
+        VdeLogger.Dispatch(this.Logger, "event-router", level, event, details)
     }
 }

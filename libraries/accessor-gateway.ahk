@@ -83,15 +83,6 @@ class VdeAccessorGateway {
     UnPinApp(hwnd) => this.IsAvailable ? DllCall(this.Procs["UnPinApp"], "UInt", hwnd) : 0
 
     _Log(level, event, details := "") {
-        if (this.Logger = "")
-            return
-        if (level = "ERROR")
-            this.Logger.Error("accessor-gateway", event, details)
-        else if (level = "WARN")
-            this.Logger.Warn("accessor-gateway", event, details)
-        else if (level = "DEBUG")
-            this.Logger.Debug("accessor-gateway", event, details)
-        else
-            this.Logger.Info("accessor-gateway", event, details)
+        VdeLogger.Dispatch(this.Logger, "accessor-gateway", level, event, details)
     }
 }

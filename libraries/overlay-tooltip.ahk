@@ -188,15 +188,6 @@ class VdeOverlayTooltip {
     }
 
     _Log(level, event, details := "") {
-        if (this.Logger = "")
-            return
-        if (level = "ERROR")
-            this.Logger.Error("overlay-tooltip", event, details)
-        else if (level = "WARN")
-            this.Logger.Warn("overlay-tooltip", event, details)
-        else if (level = "DEBUG")
-            this.Logger.Debug("overlay-tooltip", event, details)
-        else
-            this.Logger.Info("overlay-tooltip", event, details)
+        VdeLogger.Dispatch(this.Logger, "overlay-tooltip", level, event, details)
     }
 }
