@@ -46,7 +46,6 @@ Types below reflect actual parsing in `libraries/settings-provider.ahk`:
 
 #### `[General]`
 
-- `DefaultDesktop` -> `int`
 - `TaskbarScrollSwitching` -> `bool01`
 - `TaskbarScrollBottomEdgeOnly` -> `bool01`
 - `UseNativeDesktopSwitching` -> `bool01`
@@ -81,6 +80,8 @@ Note: Other tooltip keys currently remain compatibility/user-doc surface in `set
 - `PreviousDesktop` -> `string`
 - `NextDesktop` -> `string`
 - `LastActiveDesktop` -> `string`
+- `DefaultDesktop` -> `string`
+- `DefaultDesktopNumber` -> `int` (runtime-normalized to `1..9`)
 - `Desktop1..Desktop9` -> `string`
 - `DesktopAlt1..DesktopAlt9` -> `string`
 
@@ -88,6 +89,10 @@ Note: Other tooltip keys currently remain compatibility/user-doc surface in `set
 
 - `TogglePinWindow` -> `hotkey-mods-string`
 - `TogglePinApp` -> `hotkey-mods-string`
+- `PinWindow` -> `hotkey-mods-string`
+- `PinApp` -> `hotkey-mods-string`
+- `UnpinWindow` -> `hotkey-mods-string`
+- `UnpinApp` -> `hotkey-mods-string`
 - `TogglePinOnTop` -> `hotkey-mods-string`
 - `PinOnTop` -> `hotkey-mods-string`
 - `UnpinFromTop` -> `hotkey-mods-string`

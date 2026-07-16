@@ -119,6 +119,7 @@ class VdeEventRouter {
     OnMoveAndShiftLeftPress(*) => this.MoveAndSwitchToDesktop(this.Core.GetPreviousDesktopNumber())
     OnMoveAndShiftRightPress(*) => this.MoveAndSwitchToDesktop(this.Core.GetNextDesktopNumber())
     OnShiftLastActivePress(*) => this.SwitchToDesktop(this.App.PreviousDesktopNo)
+    OnShiftDefaultDesktopPress(*) => this.SwitchToDesktop(this.Settings.DefaultDesktopNumber)
     OnMoveLastActivePress(*) => this.MoveToDesktop(this.App.PreviousDesktopNo)
     OnMoveAndShiftLastActivePress(*) => this.MoveAndSwitchToDesktop(this.App.PreviousDesktopNo)
 
@@ -194,20 +195,60 @@ class VdeEventRouter {
     }
 
     TogglePinWindow(*) {
-        if this.Core.IsPinnedWindow()
+        if this.Core.IsPinnedWindow() {
             this.Core.UnpinWindow()
-        else
+            this._ShowActionTooltip("Window unpinned from all desktops")
+        } else {
             this.Core.PinWindow()
+            this._ShowActionTooltip("Window pinned to all desktops")
+        }
     }
     TogglePinApp(*) {
-        if this.Core.IsPinnedApp()
+        if this.Core.IsPinnedApp() {
             this.Core.UnpinApp()
-        else
+            this._ShowActionTooltip("App unpinned from all desktops")
+        } else {
             this.Core.PinApp()
+            this._ShowActionTooltip("App pinned to all desktops")
+        }
     }
-    ToggleOnTop(*) => WinSetAlwaysOnTop(-1, "A")
-    PinToTop(*) => WinSetAlwaysOnTop(1, "A")
-    UnpinFromTop(*) => WinSetAlwaysOnTop(0, "A")
+    PinWindow(*) {
+        this.Core.PinWindow()
+        this._ShowActionTooltip("Window pinned to all desktops")
+    }
+    PinApp(*) {
+        this.Core.PinApp()
+        this._ShowActionTooltip("App pinned to all desktops")
+    }
+    UnpinWindow(*) {
+        this.Core.UnpinWindow()
+        this._ShowActionTooltip("Window unpinned from all desktops")
+    }
+    UnpinApp(*) {
+        this.Core.UnpinApp()
+        this._ShowActionTooltip("App unpinned from all desktops")
+    }
+    ToggleOnTop(*) {
+        hwnd := WinExist("A")
+        WinSetAlwaysOnTop(-1, "ahk_id " hwnd)
+        isOnTop := (WinGetExStyle("ahk_id " hwnd) & 0x8) != 0
+        this._ShowActionTooltip(isOnTop ? "Window set always on top" : "Window removed from always on top")
+    }
+    PinToTop(*) {
+        WinSetAlwaysOnTop(1, "A")
+        this._ShowActionTooltip("Window set always on top")
+    }
+    UnpinFromTop(*) {
+        WinSetAlwaysOnTop(0, "A")
+        this._ShowActionTooltip("Window removed from always on top")
+    }
+
+    _ShowActionTooltip(text) {
+        if (!this.Settings.TooltipsEnabled)
+            return
+        this.OverlayTooltip.Show(text, this.Settings)
+        this._Log("DEBUG", "action_tooltip_show", "text=" text)
+    }
 
     ChangeDesktopName(*) {
         cur := this.Core.GetCurrentDesktopNumber()

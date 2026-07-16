@@ -4,6 +4,7 @@ class VdeSettingsValidator {
         this._ClampInt(settings, "GeneralTaskbarAntiFlickerRefreshSecondPhaseMs", 180, 20, 5000, logger)
         this._ClampInt(settings, "GeneralMaxHotkeysPerInterval", 140, 0, 1000, logger)
         this._ClampInt(settings, "GeneralHotkeyIntervalMs", 1000, 0, 60000, logger)
+        this._ClampInt(settings, "DefaultDesktopNumber", 1, 1, 9, logger)
         this._ClampInt(settings, "TooltipsLifespan", 750, 100, 10000, logger)
         this._ClampInt(settings, "TooltipsFontSize", 16, 8, 72, logger)
         this._ClampInt(settings, "TooltipsMarginX", 18, 4, 120, logger)

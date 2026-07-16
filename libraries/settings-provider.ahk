@@ -5,7 +5,6 @@ class VdeSettingsProvider {
 
         s.AppVersion := this._Str(path, "App", "Version", "0.0.0")
 
-        s.GeneralDefaultDesktop := this._Int(path, "General", "DefaultDesktop", 1)
         s.GeneralTaskbarScrollSwitching := this._Bool(path, "General", "TaskbarScrollSwitching", true)
         s.GeneralTaskbarScrollBottomEdgeOnly := this._Bool(path, "General", "TaskbarScrollBottomEdgeOnly", false)
         s.GeneralUseNativeDesktopSwitching := this._Bool(path, "General", "UseNativeDesktopSwitching", false)
@@ -49,9 +48,16 @@ class VdeSettingsProvider {
         s.HkIdentifierPrevious := this._Str(path, "KeyboardShortcutsIdentifiers", "PreviousDesktop", "Left")
         s.HkIdentifierNext := this._Str(path, "KeyboardShortcutsIdentifiers", "NextDesktop", "Right")
         s.HkIdentifierLastActive := this._Str(path, "KeyboardShortcutsIdentifiers", "LastActiveDesktop", "Numpad0")
+        s.HkIdentifierDefaultDesktop := this._Str(path, "KeyboardShortcutsIdentifiers", "DefaultDesktop", "")
+        legacyDefaultDesktop := this._Int(path, "General", "DefaultDesktop", 1)
+        s.DefaultDesktopNumber := this._Int(path, "KeyboardShortcutsIdentifiers", "DefaultDesktopNumber", legacyDefaultDesktop)
 
         s.HkComboTogglePinWindow := this._NormMods(this._Str(path, "KeyboardShortcutsCombinations", "TogglePinWindow", ""))
         s.HkComboTogglePinApp := this._NormMods(this._Str(path, "KeyboardShortcutsCombinations", "TogglePinApp", ""))
+        s.HkComboPinWindow := this._NormMods(this._Str(path, "KeyboardShortcutsCombinations", "PinWindow", ""))
+        s.HkComboPinApp := this._NormMods(this._Str(path, "KeyboardShortcutsCombinations", "PinApp", ""))
+        s.HkComboUnpinWindow := this._NormMods(this._Str(path, "KeyboardShortcutsCombinations", "UnpinWindow", ""))
+        s.HkComboUnpinApp := this._NormMods(this._Str(path, "KeyboardShortcutsCombinations", "UnpinApp", ""))
         s.HkComboTogglePinOnTop := this._NormMods(this._Str(path, "KeyboardShortcutsCombinations", "TogglePinOnTop", ""))
         s.HkComboPinOnTop := this._NormMods(this._Str(path, "KeyboardShortcutsCombinations", "PinOnTop", ""))
         s.HkComboUnpinFromTop := this._NormMods(this._Str(path, "KeyboardShortcutsCombinations", "UnpinFromTop", ""))

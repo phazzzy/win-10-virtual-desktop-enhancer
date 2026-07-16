@@ -43,7 +43,6 @@ The main settings are found in the `[General]` section of the `settings.ini` fil
 
 | Setting                                      | Description                                                                                                                                           | Valid Values                                 |
 |----------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------|
-| DefaultDesktop                               | Which desktop will be used as default (The program will switch to this desktop when started). 0 means don't switch.                                   | Any valid desktop number or 0                |
 | TaskbarScrollSwitching                       | If scrolling over the taskbar will switch desktops.                                                                                                   | `1`, `0` (Meaning YES and NO respectively)   |
 | TaskbarScrollBottomEdgeOnly                  | If taskbar scroll switching should trigger only when the cursor is on the bottom-most screen row (1 pixel). `0` keeps current taskbar-hover behavior. | `1`, `0` (Meaning YES and NO respectively)   |
 | UseNativeDesktopSwitching                    | Whether to use native Windows desktop switching when previous/next shortcuts conflict with OS shortcuts.                                              | `1`, `0` (Meaning YES and NO respectively)   |
@@ -257,6 +256,9 @@ Each _identifier_ keys' setting can be single key of your keyboard. They can be 
 | ---------------------------- |----------------------------------------------------|
 | PreviousDesktop              | Do the action for the previous desktop.            |
 | NextDesktop                  | Do the action for the next desktop.                |
+| LastActiveDesktop            | Switch to the previously active desktop.           |
+| DefaultDesktop               | Switch to `DefaultDesktopNumber`.                   |
+| DefaultDesktopNumber         | Target desktop number for `DefaultDesktop` (1..9). |
 | Desktop1                     | Do the action for desktop 1.                       |
 | Desktop2                     | Do the action for desktop 2.                       |
 | Desktop3                     | Do the action for desktop 3.                       |
@@ -313,6 +315,8 @@ MoveWindowAndSwitchToDesktopDir=Win, Ctrl, Shift
 PreviousDesktop=Left
 NextDesktop=Right
 LastActiveDesktop=
+DefaultDesktop=Numpad0
+DefaultDesktopNumber=1
 Desktop1=1
 Desktop2=2
 Desktop3=3
@@ -435,9 +439,6 @@ To get the absolute path of any file (in this case the file you want to execute)
 ### Example configuration
 
 ```ini
-[General]
-DefaultDesktop=2
-
 [RunProgramWhenSwitchingToDesktop]
 1=C:/Batch Files/Open Chrome.bat
 2=C:/Batch Files/Open Outlook.bat

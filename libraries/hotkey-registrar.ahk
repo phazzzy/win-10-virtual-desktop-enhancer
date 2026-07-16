@@ -11,6 +11,8 @@ class VdeHotkeyRegistrar {
         this._RegisterOne(this.Settings.HkModifiersSwitchDir . this.Settings.HkIdentifierPrevious, this.Router.OnShiftLeftPress.Bind(this.Router))
         this._RegisterOne(this.Settings.HkModifiersSwitchDir . this.Settings.HkIdentifierNext, this.Router.OnShiftRightPress.Bind(this.Router))
         this._RegisterOne(this.Settings.HkModifiersSwitchDir . this.Settings.HkIdentifierLastActive, this.Router.OnShiftLastActivePress.Bind(this.Router))
+        if (this.Settings.HkIdentifierDefaultDesktop != "")
+            this._RegisterOne(this.Settings.HkModifiersSwitchDir . this.Settings.HkIdentifierDefaultDesktop, this.Router.OnShiftDefaultDesktopPress.Bind(this.Router))
 
         this._RegisterOne(this.Settings.HkModifiersMoveDir . this.Settings.HkIdentifierPrevious, this.Router.OnMoveLeftPress.Bind(this.Router))
         this._RegisterOne(this.Settings.HkModifiersMoveDir . this.Settings.HkIdentifierNext, this.Router.OnMoveRightPress.Bind(this.Router))
@@ -30,6 +32,10 @@ class VdeHotkeyRegistrar {
 
         this._RegisterOne(this.Settings.HkComboTogglePinWindow, this.Router.TogglePinWindow.Bind(this.Router))
         this._RegisterOne(this.Settings.HkComboTogglePinApp, this.Router.TogglePinApp.Bind(this.Router))
+        this._RegisterOne(this.Settings.HkComboPinWindow, this.Router.PinWindow.Bind(this.Router))
+        this._RegisterOne(this.Settings.HkComboPinApp, this.Router.PinApp.Bind(this.Router))
+        this._RegisterOne(this.Settings.HkComboUnpinWindow, this.Router.UnpinWindow.Bind(this.Router))
+        this._RegisterOne(this.Settings.HkComboUnpinApp, this.Router.UnpinApp.Bind(this.Router))
         this._RegisterOne(this.Settings.HkComboTogglePinOnTop, this.Router.ToggleOnTop.Bind(this.Router))
         this._RegisterOne(this.Settings.HkComboPinOnTop, this.Router.PinToTop.Bind(this.Router))
         this._RegisterOne(this.Settings.HkComboUnpinFromTop, this.Router.UnpinFromTop.Bind(this.Router))
