@@ -195,52 +195,93 @@ class VdeEventRouter {
     }
 
     TogglePinWindow(*) {
-        if this.Core.IsPinnedWindow() {
-            this.Core.UnpinWindow()
-            this._ShowActionTooltip("Window unpinned from all desktops")
-        } else {
-            this.Core.PinWindow()
-            this._ShowActionTooltip("Window pinned to all desktops")
-        }
+        hwnd := WinExist("A")
+        if (hwnd)
+            this._SetWindowPinnedState(hwnd, !this.Core.IsPinnedWindow(hwnd))
     }
     TogglePinApp(*) {
-        if this.Core.IsPinnedApp() {
-            this.Core.UnpinApp()
-            this._ShowActionTooltip("App unpinned from all desktops")
-        } else {
-            this.Core.PinApp()
-            this._ShowActionTooltip("App pinned to all desktops")
-        }
+        hwnd := WinExist("A")
+        if (hwnd)
+            this._SetAppPinnedState(hwnd, !this.Core.IsPinnedApp(hwnd))
     }
     PinWindow(*) {
-        this.Core.PinWindow()
-        this._ShowActionTooltip("Window pinned to all desktops")
+        hwnd := WinExist("A")
+        if (hwnd)
+            this._SetWindowPinnedState(hwnd, true)
     }
     PinApp(*) {
-        this.Core.PinApp()
-        this._ShowActionTooltip("App pinned to all desktops")
+        hwnd := WinExist("A")
+        if (hwnd)
+            this._SetAppPinnedState(hwnd, true)
     }
     UnpinWindow(*) {
-        this.Core.UnpinWindow()
-        this._ShowActionTooltip("Window unpinned from all desktops")
+        hwnd := WinExist("A")
+        if (hwnd)
+            this._SetWindowPinnedState(hwnd, false)
     }
     UnpinApp(*) {
-        this.Core.UnpinApp()
-        this._ShowActionTooltip("App unpinned from all desktops")
+        hwnd := WinExist("A")
+        if (hwnd)
+            this._SetAppPinnedState(hwnd, false)
     }
     ToggleOnTop(*) {
         hwnd := WinExist("A")
-        WinSetAlwaysOnTop(-1, "ahk_id " hwnd)
-        isOnTop := (WinGetExStyle("ahk_id " hwnd) & 0x8) != 0
-        this._ShowActionTooltip(isOnTop ? "Window set always on top" : "Window removed from always on top")
+        if (hwnd)
+            this._SetAlwaysOnTopState(hwnd, (WinGetExStyle("ahk_id " hwnd) & 0x8) = 0)
     }
     PinToTop(*) {
-        WinSetAlwaysOnTop(1, "A")
-        this._ShowActionTooltip("Window set always on top")
+        hwnd := WinExist("A")
+        if (hwnd)
+            this._SetAlwaysOnTopState(hwnd, true)
     }
     UnpinFromTop(*) {
-        WinSetAlwaysOnTop(0, "A")
-        this._ShowActionTooltip("Window removed from always on top")
+        hwnd := WinExist("A")
+        if (hwnd)
+            this._SetAlwaysOnTopState(hwnd, false)
+    }
+
+    _SetWindowPinnedState(hwnd, shouldPin) {
+        if (shouldPin)
+            this.Core.PinWindow(hwnd)
+        else
+            this.Core.UnpinWindow(hwnd)
+        isPinned := !!this.Core.IsPinnedWindow(hwnd)
+        this.Tray.UpdatePinnedWindow(hwnd, isPinned)
+        this._ShowActionTooltip(isPinned ? "Window pinned to all desktops" : "Window unpinned from all desktops")
+    }
+
+    _SetAppPinnedState(hwnd, shouldPin) {
+        if (shouldPin)
+            this.Core.PinApp(hwnd)
+        else
+            this.Core.UnpinApp(hwnd)
+        isPinned := !!this.Core.IsPinnedApp(hwnd)
+        this.Tray.UpdatePinnedApp(hwnd, isPinned)
+        this._ShowActionTooltip(isPinned ? "App pinned to all desktops" : "App unpinned from all desktops")
+    }
+
+    _SetAlwaysOnTopState(hwnd, shouldPin) {
+        WinSetAlwaysOnTop(shouldPin ? 1 : 0, "ahk_id " hwnd)
+        isOnTop := (WinGetExStyle("ahk_id " hwnd) & 0x8) != 0
+        this.Tray.UpdateAlwaysOnTop(hwnd, isOnTop)
+        this._ShowActionTooltip(isOnTop ? "Window set always on top" : "Window removed from always on top")
+    }
+
+    ToggleTrackedState(id) {
+        if (!this.App.ModifiedStates.Has(id))
+            return
+        record := this.App.ModifiedStates[id]
+        hwnd := this.Tray.ResolveModifiedStateTarget(record)
+        if (!hwnd) {
+            TrayTip("Windows 11 Virtual Desktop Enhancer", "Saved window is not currently available")
+            this._Log("WARN", "tracked_state_target_missing", "id=" id " type=" record.Type)
+            return
+        }
+        switch record.Type {
+            case "PinnedWindow": this._SetWindowPinnedState(hwnd, !this.Core.IsPinnedWindow(hwnd))
+            case "PinnedApp": this._SetAppPinnedState(hwnd, !this.Core.IsPinnedApp(hwnd))
+            case "AlwaysOnTop": this._SetAlwaysOnTopState(hwnd, (WinGetExStyle("ahk_id " hwnd) & 0x8) = 0)
+        }
     }
 
     _ShowActionTooltip(text) {

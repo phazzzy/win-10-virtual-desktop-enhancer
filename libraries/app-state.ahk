@@ -9,6 +9,8 @@ class VdeAppState {
         this.HotkeyToAction := Map()
         this.DesktopMenuItems := Map()
         this.DesktopNames := Map()
+        this.ModifiedStates := Map()
+        this.NextModifiedStateId := 1
         this.NumDesktops := 0
         this.InitialDesktopNo := 0
         this.ChangeDesktopNamesPopupTitle := "Windows 11 Virtual Desktop Enhancer"

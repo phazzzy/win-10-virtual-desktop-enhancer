@@ -6,6 +6,8 @@ class VdeTrayRenderer {
         this.Logger := logger
         this.Router := ""
         this.ScriptMenu := ""
+        this.ModifiedStateMenu := ""
+        this.StatePath := A_ScriptDir "\window-state.ini"
         this.MenuKeys := Map(
             "EnableKeys", "Enable shortcuts",
             "TaskbarScrollSwitching", "Taskbar scroll switching",
@@ -25,14 +27,20 @@ class VdeTrayRenderer {
 
     BuildInitial() {
         this._Log("INFO", "tray_build_begin")
-        A_TrayMenu.Delete()
-        this._BuildScriptSection()
-        this._BuildDesktopsSection()
-
-        this.SyncMenuState(this.App.InitialDesktopNo)
-
+        this._LoadModifiedStates()
+        this._RebuildTrayMenu()
         this.UpdateTrayIcon(this.App.InitialDesktopNo)
         this._Log("INFO", "tray_build_done")
+    }
+
+    _RebuildTrayMenu() {
+        A_TrayMenu.Delete()
+        this._BuildScriptSection()
+        this._BuildModifiedStateItems()
+        A_TrayMenu.Add()
+        this._BuildDesktopsSection()
+        currentDesktop := this.App.CurrentDesktopNo > 0 ? this.App.CurrentDesktopNo : this.App.InitialDesktopNo
+        this.SyncMenuState(currentDesktop)
     }
 
     _BuildDesktopsSection() {
@@ -61,7 +69,211 @@ class VdeTrayRenderer {
         this.ScriptMenu.Add("Exit", (*) => ExitApp())
         this.ScriptMenu.Default := "Enable shortcuts"
         A_TrayMenu.Add("Script", this.ScriptMenu)
-        A_TrayMenu.Add()
+    }
+
+    _BuildModifiedStateItems() {
+        if (this.App.ModifiedStates.Count = 0) {
+            A_TrayMenu.Add("No pinned items", (*) => 0)
+            A_TrayMenu.Disable("No pinned items")
+            return
+        }
+        this.ModifiedStateMenu := Menu()
+        for id, record in this.App.ModifiedStates {
+            hwnd := this.ResolveModifiedStateTarget(record)
+            record.Active := this._IsRecordActive(record, hwnd)
+            label := this._GetStateLabel(record)
+            this.ModifiedStateMenu.Add(label, ObjBindMethod(this, "ToggleModifiedState", id))
+            if (record.Active)
+                this.ModifiedStateMenu.Check(label)
+        }
+        A_TrayMenu.Add(this.App.ModifiedStates.Count " pinned", this.ModifiedStateMenu)
+    }
+
+    UpdatePinnedWindow(hwnd, isPinned) {
+        this._UpdateModifiedState("PinnedWindow", hwnd, isPinned)
+    }
+
+    UpdatePinnedApp(hwnd, isPinned) {
+        this._UpdateModifiedState("PinnedApp", hwnd, isPinned)
+    }
+
+    UpdateAlwaysOnTop(hwnd, isOnTop) {
+        this._UpdateModifiedState("AlwaysOnTop", hwnd, isOnTop)
+    }
+
+    ToggleModifiedState(id, *) {
+        if (this.Router = "" || !this.App.ModifiedStates.Has(id))
+            return
+        this.Router.ToggleTrackedState(id)
+    }
+
+    ResolveModifiedStateTarget(record) {
+        if (record.Hwnd && WinExist("ahk_id " record.Hwnd)) {
+            current := this._GetWindowIdentity(record.Hwnd)
+            if (record.Type = "PinnedApp" ? this._SameProcess(record, current) : this._SameProcessAndClass(record, current))
+                return record.Hwnd
+        }
+
+        fallbackMatches := []
+        for _, hwnd in WinGetList() {
+            current := this._GetWindowIdentity(hwnd)
+            if (record.Type = "PinnedApp" && this._SameProcess(record, current)) {
+                record.Hwnd := hwnd
+                return hwnd
+            }
+            if (record.Type != "PinnedApp" && this._SameWindowSignature(record, current)) {
+                record.Hwnd := hwnd
+                return hwnd
+            }
+            if (record.Type != "PinnedApp" && this._SameProcessAndClass(record, current))
+                fallbackMatches.Push(hwnd)
+        }
+        if (fallbackMatches.Length = 1) {
+            record.Hwnd := fallbackMatches[1]
+            return record.Hwnd
+        }
+        record.Hwnd := 0
+        return 0
+    }
+
+    _UpdateModifiedState(type, hwnd, isEnabled) {
+        if (!hwnd)
+            return
+        identity := this._GetWindowIdentity(hwnd)
+        id := this._FindModifiedState(type, identity)
+        if (isEnabled) {
+            if (id = "") {
+                id := this.App.NextModifiedStateId ""
+                this.App.NextModifiedStateId += 1
+            }
+            identity.Id := id
+            identity.Type := type
+            identity.Active := true
+            this.App.ModifiedStates[id] := identity
+        } else if (id != "") {
+            this.App.ModifiedStates.Delete(id)
+        }
+        this._SaveModifiedStates()
+        this._RebuildTrayMenu()
+    }
+
+    _GetWindowIdentity(hwnd) {
+        try processName := WinGetProcessName("ahk_id " hwnd)
+        catch
+            processName := ""
+        try processPath := WinGetProcessPath("ahk_id " hwnd)
+        catch
+            processPath := ""
+        try windowClass := WinGetClass("ahk_id " hwnd)
+        catch
+            windowClass := ""
+        try title := WinGetTitle("ahk_id " hwnd)
+        catch
+            title := ""
+        return {
+            Hwnd: hwnd,
+            ProcessName: processName,
+            ProcessPath: processPath,
+            WindowClass: windowClass,
+            Title: title
+        }
+    }
+
+    _FindModifiedState(type, identity) {
+        for id, record in this.App.ModifiedStates {
+            if (record.Type != type)
+                continue
+            if (record.Hwnd = identity.Hwnd)
+                return id
+            if (type = "PinnedApp" && this._SameProcess(record, identity))
+                return id
+            if (type != "PinnedApp" && this._SameWindowSignature(record, identity))
+                return id
+        }
+        return ""
+    }
+
+    _SameProcess(left, right) {
+        if (left.ProcessPath != "" && right.ProcessPath != "")
+            return StrLower(left.ProcessPath) = StrLower(right.ProcessPath)
+        return left.ProcessName != "" && StrLower(left.ProcessName) = StrLower(right.ProcessName)
+    }
+
+    _SameWindowSignature(left, right) {
+        return this._SameProcessAndClass(left, right)
+            && left.Title = right.Title
+    }
+
+    _SameProcessAndClass(left, right) {
+        return this._SameProcess(left, right) && left.WindowClass = right.WindowClass
+    }
+
+    _IsRecordActive(record, hwnd) {
+        if (!hwnd)
+            return false
+        try {
+            switch record.Type {
+                case "PinnedWindow": return !!this.Core.IsPinnedWindow(hwnd)
+                case "PinnedApp": return !!this.Core.IsPinnedApp(hwnd)
+                case "AlwaysOnTop": return (WinGetExStyle("ahk_id " hwnd) & 0x8) != 0
+            }
+        }
+        return false
+    }
+
+    _GetStateLabel(record) {
+        prefix := Map(
+            "PinnedWindow", "[All desktops: window] ",
+            "PinnedApp", "[All desktops: app] ",
+            "AlwaysOnTop", "[Always on top] "
+        )[record.Type]
+        appName := record.ProcessName != "" ? record.ProcessName : "Unknown app"
+        name := record.Type != "PinnedApp" && record.Title != "" ? appName " — " record.Title : appName
+        return prefix name " (#" record.Id ")"
+    }
+
+    _LoadModifiedStates() {
+        this.App.ModifiedStates := Map()
+        this.App.NextModifiedStateId := 1
+        if (!FileExist(this.StatePath))
+            return
+        try sectionsText := IniRead(this.StatePath)
+        catch
+            return
+        for _, section in StrSplit(sectionsText, "`n", "`r") {
+            if (!RegExMatch(section, "^State(\d+)$", &match))
+                continue
+            id := match[1]
+            type := IniRead(this.StatePath, section, "Type", "")
+            if !(type = "PinnedWindow" || type = "PinnedApp" || type = "AlwaysOnTop")
+                continue
+            record := {
+                Id: id,
+                Type: type,
+                Hwnd: Integer(IniRead(this.StatePath, section, "Hwnd", "0")),
+                ProcessName: IniRead(this.StatePath, section, "ProcessName", ""),
+                ProcessPath: IniRead(this.StatePath, section, "ProcessPath", ""),
+                WindowClass: IniRead(this.StatePath, section, "WindowClass", ""),
+                Title: IniRead(this.StatePath, section, "Title", ""),
+                Active: false
+            }
+            this.App.ModifiedStates[id] := record
+            this.App.NextModifiedStateId := Max(this.App.NextModifiedStateId, Integer(id) + 1)
+        }
+    }
+
+    _SaveModifiedStates() {
+        if (FileExist(this.StatePath))
+            FileDelete(this.StatePath)
+        for id, record in this.App.ModifiedStates {
+            section := "State" id
+            IniWrite(record.Type, this.StatePath, section, "Type")
+            IniWrite(record.Hwnd, this.StatePath, section, "Hwnd")
+            IniWrite(record.ProcessName, this.StatePath, section, "ProcessName")
+            IniWrite(record.ProcessPath, this.StatePath, section, "ProcessPath")
+            IniWrite(record.WindowClass, this.StatePath, section, "WindowClass")
+            IniWrite(StrReplace(record.Title, "`n", " "), this.StatePath, section, "Title")
+        }
     }
 
     ToggleDisabled() {

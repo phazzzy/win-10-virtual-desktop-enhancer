@@ -52,12 +52,12 @@ class VdeCoreDomain {
         this.Gateway.MoveWindowToDesktopNumber(hwnd, n)
         this._Log("DEBUG", "move_window_done", "target=" n " hwnd=" hwnd)
     }
-    PinWindow() => this.Gateway.PinWindow(WinExist("A"))
-    UnpinWindow() => this.Gateway.UnPinWindow(WinExist("A"))
-    IsPinnedWindow() => this.Gateway.IsPinnedWindow(WinExist("A"))
-    PinApp() => this.Gateway.PinApp(WinExist("A"))
-    UnpinApp() => this.Gateway.UnPinApp(WinExist("A"))
-    IsPinnedApp() => this.Gateway.IsPinnedApp(WinExist("A"))
+    PinWindow(hwnd := 0) => this.Gateway.PinWindow(hwnd ? hwnd : WinExist("A"))
+    UnpinWindow(hwnd := 0) => this.Gateway.UnPinWindow(hwnd ? hwnd : WinExist("A"))
+    IsPinnedWindow(hwnd := 0) => this.Gateway.IsPinnedWindow(hwnd ? hwnd : WinExist("A"))
+    PinApp(hwnd := 0) => this.Gateway.PinApp(hwnd ? hwnd : WinExist("A"))
+    UnpinApp(hwnd := 0) => this.Gateway.UnPinApp(hwnd ? hwnd : WinExist("A"))
+    IsPinnedApp(hwnd := 0) => this.Gateway.IsPinnedApp(hwnd ? hwnd : WinExist("A"))
 
     IsCursorHoveringTaskbar() {
         if (this.Settings.GeneralTaskbarScrollBottomEdgeOnly)
